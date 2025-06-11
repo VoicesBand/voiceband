@@ -20,7 +20,7 @@
       z-index: 4000;
     }
     label { display: block; margin-top: 15px; }
-    input[type="text"], input[type="password"] {
+    input[type="text"], input[type="password"], textarea {
       width: 100%;
       padding: 8px;
       font-size: 14px;
@@ -54,7 +54,7 @@
 
     <!-- Video URL Inputs -->
     <div id="video-url-editor">
-      <h2>Manage Video URLs</h2>
+      <h2>🎬 Manage Video URLs</h2>
       <div id="video-inputs"></div>
       <button id="add-video-btn">Add New Video URL</button>
       <button id="save-videos-btn">Save Video URLs</button>
@@ -67,6 +67,39 @@
       <button onclick="alert('Play Video 2')">Play Video 2</button>
     </div>
 
+    <!-- Editable "About Voices" Text -->
+    <div id="about-editor" style="margin-top: 40px;">
+      <h2>📝 Edit "About Voices" Section</h2>
+      <textarea id="about-text" rows="6" placeholder="Write about Voices here..."></textarea><br>
+      <button onclick="saveAbout()">Save About Section</button>
+      <p id="about-save-status"></p>
+    </div>
+
+    <!-- Upcoming Shows Editor -->
+    <div id="shows-editor" style="margin-top: 40px;">
+      <h2>📅 Manage Upcoming Shows</h2>
+      <textarea id="shows-list" rows="6" placeholder="e.g. July 20 – The Pageant STL"></textarea><br>
+      <button onclick="saveShows()">Save Shows</button>
+      <p id="shows-save-status"></p>
+    </div>
+
+    <!-- Logo URL Changer -->
+    <div id="logo-editor" style="margin-top: 40px;">
+      <h2>🖼️ Update Logo (Top Left)</h2>
+      <input id="logo-url" type="text" placeholder="Paste image URL" style="width: 100%;"><br>
+      <button onclick="saveLogo()">Save Logo</button>
+      <p id="logo-save-status"></p>
+    </div>
+
+    <!-- Booking Sheet Link -->
+    <div id="booking-sheet" style="margin-top: 40px;">
+      <h2>📄 Booking Sheet</h2>
+      <a href="https://docs.google.com/spreadsheets/d/1Fucpvl0eNb2WfAirA2suqLIQLYjjJ5v68W7Z4WD95_E/edit?resourcekey=&gid=807357404#gid=807357404" 
+         target="_blank">
+         Open Booking Sheet
+      </a>
+    </div>
+
     <!-- Container for Bookings Table -->
     <div id="bookings-container"></div>
   </div>
@@ -74,6 +107,26 @@
   <script>
     const PASSWORD = 'test123'; // Change this to your password
 
+    // Initial load: populate inputs from localStorage
+    window.onload = () => {
+      // Videos
+      videoUrls = JSON.parse(localStorage.getItem('videoUrls')) || [
+        "https://www.youtube.com/embed/ycCKV5uYKSE",
+        "https://www.youtube.com/embed/O-PhaZvzlYw"
+      ];
+      renderVideoInputs();
+
+      // About
+      document.getElementById('about-text').value = localStorage.getItem('aboutText') || '';
+
+      // Shows
+      document.getElementById('shows-list').value = localStorage.getItem('showsList') || '';
+
+      // Logo
+      document.getElementById('logo-url').value = localStorage.getItem('logoURL') || '';
+    };
+
+    // Login logic
     const loginScreen = document.getElementById('login-screen');
     const adminContent = document.getElementById('admin-content');
     const loginBtn = document.getElementById('login-btn');
@@ -95,10 +148,7 @@
     const saveVideosBtn = document.getElementById('save-videos-btn');
     const videoSaveStatus = document.getElementById('video-save-status');
 
-    let videoUrls = JSON.parse(localStorage.getItem('videoUrls')) || [
-      "https://www.youtube.com/embed/ycCKV5uYKSE",
-      "https://www.youtube.com/embed/O-PhaZvzlYw"
-    ];
+    let videoUrls = [];
 
     function renderVideoInputs() {
       videoInputsContainer.innerHTML = '';
@@ -148,7 +198,35 @@
       videoSaveStatus.style.color = 'green';
     });
 
-    renderVideoInputs();
+    // Save About Section
+    function saveAbout() {
+      const text = document.getElementById('about-text').value;
+      localStorage.setItem('aboutText', text);
+      const status = document.getElementById('about-save-status');
+      status.textContent = 'About section updated!';
+      status.style.color = 'green';
+      setTimeout(() => { status.textContent = ''; }, 3000);
+    }
+
+    // Save Shows List
+    function saveShows() {
+      const text = document.getElementById('shows-list').value;
+      localStorage.setItem('showsList', text);
+      const status = document.getElementById('shows-save-status');
+      status.textContent = 'Shows updated!';
+      status.style.color = 'green';
+      setTimeout(() => { status.textContent = ''; }, 3000);
+    }
+
+    // Save Logo URL
+    function saveLogo() {
+      const url = document.getElementById('logo-url').value;
+      localStorage.setItem('logoURL', url);
+      const status = document.getElementById('logo-save-status');
+      status.textContent = 'Logo URL updated!';
+      status.style.color = 'green';
+      setTimeout(() => { status.textContent = ''; }, 3000);
+    }
   </script>
 
 </body>
