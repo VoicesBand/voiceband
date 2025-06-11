@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Voices - STL's Premier Classic Band</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- Logo top-left -->
+  <div class="logo">
+    <img src="images/logoGTO.jpg" alt="Voices Logo">
+  </div>
+
+  <!-- Navigation bar -->
+  <nav class="nav-bar">
+    <button onclick="scrollToSection('about')">about</button>
+    <button onclick="scrollToSection('shows')">shows</button>
+    <button onclick="scrollToSection('gallery')">gallery</button>
+    <button onclick="scrollToSection('booking')">booking</button>
+    <a href="admin.html" class="admin-link">Admin</a>
+  </nav>
+
+  <!-- Band Banner Photo -->
+  <header class="hero">
+    <img src="images/banner.jpg" alt="Voices Band Banner">
+  </header>
+
+  <!-- About Section -->
+  <section id="About">
+    <h2>🎤 Voices</h2>
+    <p>
+      Formerly known as GTO (Good Time Oldies), Voices is a seasoned 4-piece band
+      performing around the STL Metro area. Blending live instruments and synthetic backing tracks,
+      they cover classic hits from the 60s through the 2000s — full of energy, sound, and nostalgia.
+
+      Left (Pat Downs) ,middle Left (Billy Presnell), Middle right (Dennis Gillam), Right (Jesse Miller).
+    </p>
+  </section>
+
+  <!-- Shows Section -->
+  <section id="Shows">
+    <h2>Upcoming Shows</h2>
+    <ul>
+      <li><strong>June 15</strong> – Belleville Street Fair</li>
+      <li><strong>July 4</strong> – O'Fallon Fireworks Fest</li>
+      <li><strong>July 20</strong> – The Pageant STL</li>
+      <li><strong>August 3</strong> – Chesterfield Summer Series</li>
+    </ul>
+  </section>
+
+  <!-- Media Gallery -->
+<section id="Gallery">
+  <h2>Media Gallery</h2>
+  <div class="video-grid" id="video-grid">
+    <!-- Videos will be inserted here dynamically -->
+  </div>
+  <a href="https://www.youtube.com/@VoicesSTL" target="_blank" class="btn">More Videos</a>
+</section>
+
+<script>
+  // Default videos if none saved in localStorage
+  const defaultVideos = [
+    "https://www.youtube.com/embed/ycCKV5uYKSE",
+    "https://www.youtube.com/embed/O-PhaZvzlYw"
+  ];
+
+  // Load video URLs from localStorage or use default
+  const videoUrls = JSON.parse(localStorage.getItem('videoUrls')) || defaultVideos;
+
+  const videoGrid = document.getElementById('video-grid');
+  videoGrid.innerHTML = '';
+
+  videoUrls.forEach(url => {
+    const iframe = document.createElement('iframe');
+    iframe.src = url;
+    iframe.allowFullscreen = true;
+    videoGrid.appendChild(iframe);
+  });
+</script>
+
+ <section id="booking">
+  <h2>Book Voices</h2>
+  <iframe 
+    src="https://docs.google.com/forms/d/e/1FAIpQLSc8YrV1tr8IuUDKh98gRG5KXC6PyoiE2G7D2zBodrSwv-_w_g/viewform?usp=sharing&ouid=108029081950798897332" 
+    width="100%" 
+    height="800" 
+    frameborder="0" 
+    marginheight="0" 
+    marginwidth="0">
+    Loading…
+  </iframe>
+</section>
+
+  <script>
+    const GOOGLE_SCRIPT_URL = '<iframe src="https://docs.google.com/forms/d/e/1FAIpQLSc8YrV1tr8IuUDKh98gRG5KXC6PyoiE2G7D2zBodrSwv-_w_g/viewform?embedded=true" width="640" height="1089" frameborder="0" marginheight="0" marginwidth="0">Loading…</iframe>'; // Replace with your deployed Google Apps Script URL
+
+    document.getElementById('booking-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const form = e.target;
+
+      const data = {
+        name: form.from_name.value,
+        date: form.reply_email.value,
+        email: form.event_date.value,
+        location: form.event_location.value,
+        message: form.message.value
+      };
+
+      fetch(GOOGLE_SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      })
+      .then(response => {
+        if (response.ok) {
+          document.getElementById('booking-status').textContent = 'Booking submitted!';
+          form.reset();
+          document.getElementById('booking-status').style.color = '#188038';
+        } else {
+          throw new Error('Network response was not ok');
+        }
+      })
+      .catch(() => {
+        document.getElementById('booking-status').textContent = 'Failed to submit booking. Please try again.';
+        document.getElementById('booking-status').style.color = '#b00020';
+      });
+    });
+    function scrollToSection(sectionId) {
+  const section = document.getElementById(sectionId.toLowerCase());
+  if (section) {
+    section.scrollIntoView({ behavior: 'smooth' });
+  }
+}
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Voices Admin</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    #home-btn {
+      position: static;
+      top: 6px;
+      left: 6px;
+      padding: 8px 15px;
+      font-size: 14px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      z-index: 4000;
+    }
+    label { display: block; margin-top: 15px; }
+    input[type="text"], input[type="password"] {
+      width: 100%;
+      padding: 8px;
+      font-size: 14px;
+      margin-top: 5px;
+      box-sizing: border-box;
+    }
+    button { margin-top: 20px; padding: 10px 20px; font-size: 16px; cursor: pointer; }
+    table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+    th { background-color: #f4f4f4; }
+    #bookings-container { margin-top: 20px; }
+    #admin-content { display: none; }
+  </style>
+</head>
+<body>
+
+  <!-- Password login screen -->
+  <div id="login-screen">
+    <h2>Admin Login</h2>
+    <label for="password">Enter password:</label>
+    <input type="password" id="password" autocomplete="off" />
+    <button id="login-btn">Login</button>
+    <p id="login-error" style="color:red;"></p>
+  </div>
+
+  <!-- Admin dashboard content -->
+  <div id="admin-content">
+    <button id="home-btn" onclick="location.href='index.html'">Home</button>
+
+    <h1>Voices Admin Dashboard</h1>
+
+    <!-- Video URL Inputs -->
+    <div id="video-url-editor">
+      <h2>Manage Video URLs</h2>
+      <div id="video-inputs"></div>
+      <button id="add-video-btn">Add New Video URL</button>
+      <button id="save-videos-btn">Save Video URLs</button>
+      <p id="video-save-status"></p>
+    </div>
+
+    <!-- Existing Video UI Buttons -->
+    <div id="video-ui" style="margin-top: 40px;">
+      <button onclick="alert('Play Video 1')">Play Video 1</button>
+      <button onclick="alert('Play Video 2')">Play Video 2</button>
+    </div>
+
+    <!-- Container for Bookings Table -->
+    <div id="bookings-container"></div>
+  </div>
+
+  <script>
+    const PASSWORD = 'test123'; // Change this to your password
+
+    const loginScreen = document.getElementById('login-screen');
+    const adminContent = document.getElementById('admin-content');
+    const loginBtn = document.getElementById('login-btn');
+    const loginError = document.getElementById('login-error');
+
+    loginBtn.addEventListener('click', () => {
+      const entered = document.getElementById('password').value;
+      if (entered === PASSWORD) {
+        loginScreen.style.display = 'none';
+        adminContent.style.display = 'block';
+      } else {
+        loginError.textContent = 'Incorrect password, please try again.';
+      }
+    });
+
+    // Video URLs editor logic
+    const videoInputsContainer = document.getElementById('video-inputs');
+    const addVideoBtn = document.getElementById('add-video-btn');
+    const saveVideosBtn = document.getElementById('save-videos-btn');
+    const videoSaveStatus = document.getElementById('video-save-status');
+
+    let videoUrls = JSON.parse(localStorage.getItem('videoUrls')) || [
+      "https://www.youtube.com/embed/ycCKV5uYKSE",
+      "https://www.youtube.com/embed/O-PhaZvzlYw"
+    ];
+
+    function renderVideoInputs() {
+      videoInputsContainer.innerHTML = '';
+      videoUrls.forEach((url, i) => {
+        const div = document.createElement('div');
+        div.style.marginBottom = '10px';
+        div.innerHTML = `
+          <label>Video URL ${i + 1}:
+            <input type="text" value="${url}" data-index="${i}" />
+            <button data-index="${i}" class="remove-btn" style="margin-left:10px;">Remove</button>
+          </label>
+        `;
+        videoInputsContainer.appendChild(div);
+      });
+
+      // Remove button handlers
+      document.querySelectorAll('.remove-btn').forEach(btn => {
+        btn.addEventListener('click', e => {
+          const idx = e.target.getAttribute('data-index');
+          videoUrls.splice(idx, 1);
+          renderVideoInputs();
+        });
+      });
+
+      // Input change handlers
+      videoInputsContainer.querySelectorAll('input[type="text"]').forEach(input => {
+        input.addEventListener('input', e => {
+          const idx = e.target.getAttribute('data-index');
+          videoUrls[idx] = e.target.value;
+        });
+      });
+    }
+
+    addVideoBtn.addEventListener('click', () => {
+      videoUrls.push('');
+      renderVideoInputs();
+    });
+
+    saveVideosBtn.addEventListener('click', () => {
+      if (videoUrls.some(url => url.trim() === '')) {
+        videoSaveStatus.textContent = 'Please fill in all video URLs or remove empty ones.';
+        videoSaveStatus.style.color = 'red';
+        return;
+      }
+      localStorage.setItem('videoUrls', JSON.stringify(videoUrls));
+      videoSaveStatus.textContent = 'Video URLs saved successfully!';
+      videoSaveStatus.style.color = 'green';
+    });
+
+    renderVideoInputs();
+  </script>
+
+</body>
+</html>
