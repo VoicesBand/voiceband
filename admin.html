@@ -28,16 +28,12 @@
       box-sizing: border-box;
     }
     button { margin-top: 20px; padding: 10px 20px; font-size: 16px; cursor: pointer; }
-    table { border-collapse: collapse; width: 100%; margin-top: 20px; }
-    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
-    th { background-color: #f4f4f4; }
-    #bookings-container { margin-top: 20px; }
     #admin-content { display: none; }
+    .section { margin-top: 40px; }
   </style>
 </head>
 <body>
 
-  <!-- Password login screen -->
   <div id="login-screen">
     <h2>Admin Login</h2>
     <label for="password">Enter password:</label>
@@ -46,14 +42,11 @@
     <p id="login-error" style="color:red;"></p>
   </div>
 
-  <!-- Admin dashboard content -->
   <div id="admin-content">
     <button id="home-btn" onclick="location.href='index.html'">Home</button>
-
     <h1>Voices Admin Dashboard</h1>
 
-    <!-- Video URL Inputs -->
-    <div id="video-url-editor">
+    <div class="section">
       <h2>🎬 Manage Video URLs</h2>
       <div id="video-inputs"></div>
       <button id="add-video-btn">Add New Video URL</button>
@@ -61,72 +54,38 @@
       <p id="video-save-status"></p>
     </div>
 
-    <!-- Existing Video UI Buttons -->
-    <div id="video-ui" style="margin-top: 40px;">
-      <button onclick="alert('Play Video 1')">Play Video 1</button>
-      <button onclick="alert('Play Video 2')">Play Video 2</button>
-    </div>
-
-    <!-- Editable "About Voices" Text -->
-    <div id="about-editor" style="margin-top: 40px;">
-      <h2>📝 Edit "About Voices" Section</h2>
+    <div class="section">
+      <h2>📝 Edit "About Voices"</h2>
       <textarea id="about-text" rows="6" placeholder="Write about Voices here..."></textarea><br>
       <button onclick="saveAbout()">Save About Section</button>
       <p id="about-save-status"></p>
     </div>
 
-    <!-- Upcoming Shows Editor -->
-    <div id="shows-editor" style="margin-top: 40px;">
+    <div class="section">
       <h2>📅 Manage Upcoming Shows</h2>
       <textarea id="shows-list" rows="6" placeholder="e.g. July 20 – The Pageant STL"></textarea><br>
       <button onclick="saveShows()">Save Shows</button>
       <p id="shows-save-status"></p>
     </div>
 
-    <!-- Logo URL Changer -->
-    <div id="logo-editor" style="margin-top: 40px;">
+    <div class="section">
       <h2>🖼️ Update Logo (Top Left)</h2>
-      <input id="logo-url" type="text" placeholder="Paste image URL" style="width: 100%;"><br>
+      <input id="logo-url" type="text" placeholder="Paste image URL"><br>
       <button onclick="saveLogo()">Save Logo</button>
       <p id="logo-save-status"></p>
     </div>
 
-    <!-- Booking Sheet Link -->
-    <div id="booking-sheet" style="margin-top: 40px;">
-      <h2>📄 Booking Sheet</h2>
-      <a href="https://docs.google.com/spreadsheets/d/1Fucpvl0eNb2WfAirA2suqLIQLYjjJ5v68W7Z4WD95_E/edit?resourcekey=&gid=807357404#gid=807357404" 
+    <div class="section">
+      <h2>📄 Booking Spreadsheet</h2>
+      <a href="https://docs.google.com/spreadsheets/d/1Fucpvl0eNb2WfAirA2suqLIQLYjjJ5v68W7Z4WD95_E/edit#gid=807357404" 
          target="_blank">
-         Open Booking Sheet
+         Open Booking Google Sheet
       </a>
     </div>
-
-    <!-- Container for Bookings Table -->
-    <div id="bookings-container"></div>
   </div>
 
   <script>
-    const PASSWORD = 'test123'; // Change this to your password
-
-    // Initial load: populate inputs from localStorage
-    window.onload = () => {
-      // Videos
-      videoUrls = JSON.parse(localStorage.getItem('videoUrls')) || [
-        "https://www.youtube.com/embed/ycCKV5uYKSE",
-        "https://www.youtube.com/embed/O-PhaZvzlYw"
-      ];
-      renderVideoInputs();
-
-      // About
-      document.getElementById('about-text').value = localStorage.getItem('aboutText') || '';
-
-      // Shows
-      document.getElementById('shows-list').value = localStorage.getItem('showsList') || '';
-
-      // Logo
-      document.getElementById('logo-url').value = localStorage.getItem('logoURL') || '';
-    };
-
-    // Login logic
+    const PASSWORD = 'test123';
     const loginScreen = document.getElementById('login-screen');
     const adminContent = document.getElementById('admin-content');
     const loginBtn = document.getElementById('login-btn');
@@ -142,7 +101,18 @@
       }
     });
 
-    // Video URLs editor logic
+    window.onload = () => {
+      videoUrls = JSON.parse(localStorage.getItem('videoUrls')) || [
+        "https://www.youtube.com/embed/ycCKV5uYKSE",
+        "https://www.youtube.com/embed/O-PhaZvzlYw"
+      ];
+      renderVideoInputs();
+
+      document.getElementById('about-text').value = localStorage.getItem('aboutText') || '';
+      document.getElementById('shows-list').value = localStorage.getItem('showsList') || '';
+      document.getElementById('logo-url').value = localStorage.getItem('logoURL') || '';
+    };
+
     const videoInputsContainer = document.getElementById('video-inputs');
     const addVideoBtn = document.getElementById('add-video-btn');
     const saveVideosBtn = document.getElementById('save-videos-btn');
@@ -154,7 +124,6 @@
       videoInputsContainer.innerHTML = '';
       videoUrls.forEach((url, i) => {
         const div = document.createElement('div');
-        div.style.marginBottom = '10px';
         div.innerHTML = `
           <label>Video URL ${i + 1}:
             <input type="text" value="${url}" data-index="${i}" />
@@ -164,7 +133,6 @@
         videoInputsContainer.appendChild(div);
       });
 
-      // Remove button handlers
       document.querySelectorAll('.remove-btn').forEach(btn => {
         btn.addEventListener('click', e => {
           const idx = e.target.getAttribute('data-index');
@@ -173,7 +141,6 @@
         });
       });
 
-      // Input change handlers
       videoInputsContainer.querySelectorAll('input[type="text"]').forEach(input => {
         input.addEventListener('input', e => {
           const idx = e.target.getAttribute('data-index');
@@ -194,40 +161,40 @@
         return;
       }
       localStorage.setItem('videoUrls', JSON.stringify(videoUrls));
+      localStorage.setItem('lastUpdate', Date.now());  // Trigger update
       videoSaveStatus.textContent = 'Video URLs saved successfully!';
       videoSaveStatus.style.color = 'green';
     });
 
-    // Save About Section
     function saveAbout() {
       const text = document.getElementById('about-text').value;
       localStorage.setItem('aboutText', text);
+      localStorage.setItem('lastUpdate', Date.now());
       const status = document.getElementById('about-save-status');
       status.textContent = 'About section updated!';
       status.style.color = 'green';
       setTimeout(() => { status.textContent = ''; }, 3000);
     }
 
-    // Save Shows List
     function saveShows() {
       const text = document.getElementById('shows-list').value;
       localStorage.setItem('showsList', text);
+      localStorage.setItem('lastUpdate', Date.now());
       const status = document.getElementById('shows-save-status');
       status.textContent = 'Shows updated!';
       status.style.color = 'green';
       setTimeout(() => { status.textContent = ''; }, 3000);
     }
 
-    // Save Logo URL
     function saveLogo() {
       const url = document.getElementById('logo-url').value;
       localStorage.setItem('logoURL', url);
+      localStorage.setItem('lastUpdate', Date.now());
       const status = document.getElementById('logo-save-status');
       status.textContent = 'Logo URL updated!';
       status.style.color = 'green';
       setTimeout(() => { status.textContent = ''; }, 3000);
     }
   </script>
-
 </body>
 </html>

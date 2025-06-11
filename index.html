@@ -6,7 +6,6 @@
   <title>Voices - STL's Premier Classic Band</title>
   <link rel="stylesheet" href="style.css" />
   <style>
-    /* Ensure iframes in video grid have proper size */
     #video-grid iframe {
       width: 100%;
       max-width: 560px;
@@ -21,12 +20,10 @@
 </head>
 <body>
 
-  <!-- Logo top-left -->
   <div class="logo">
     <img id="logo-img" src="images/logoGTO.jpg" alt="Voices Logo" />
   </div>
 
-  <!-- Navigation bar -->
   <nav class="nav-bar">
     <button onclick="scrollToSection('about')">about</button>
     <button onclick="scrollToSection('shows')">shows</button>
@@ -35,75 +32,55 @@
     <a href="admin.html" class="admin-link">Admin</a>
   </nav>
 
-  <!-- Band Banner Photo -->
   <header class="hero">
     <img src="images/banner.jpg" alt="Voices Band Banner" />
   </header>
 
-  <!-- About Section -->
   <section id="about">
     <h2>🎤 Voices</h2>
     <p id="about-text">
       Formerly known as GTO (Good Time Oldies), Voices is a seasoned 4-piece band
-      performing around the STL Metro area. Blending live instruments and synthetic backing tracks,
-      they cover classic hits from the 60s through the 2000s — full of energy, sound, and nostalgia.
-
-      Left (Pat Downs), middle Left (Billy Presnell), Middle right (Dennis Gillam), Right (Jesse Miller).
+      performing around the STL Metro area...
     </p>
   </section>
 
-  <!-- Shows Section -->
   <section id="shows">
     <h2>Upcoming Shows</h2>
     <div id="upcoming-shows">Default upcoming shows info here...</div>
   </section>
 
-  <!-- Media Gallery -->
   <section id="gallery">
     <h2>Media Gallery</h2>
-    <div class="video-grid" id="video-grid">
-      <!-- Videos will be inserted here dynamically -->
-    </div>
+    <div class="video-grid" id="video-grid"></div>
     <a href="https://www.youtube.com/@VoicesSTL" target="_blank" class="btn">More Videos</a>
   </section>
 
-  <!-- Booking Section -->
   <section id="booking">
     <h2>Book Voices</h2>
     <iframe 
       src="https://docs.google.com/forms/d/e/1FAIpQLSc8YrV1tr8IuUDKh98gRG5KXC6PyoiE2G7D2zBodrSwv-_w_g/viewform?usp=sharing&ouid=108029081950798897332" 
-      width="100%" 
-      height="800" 
-      frameborder="0" 
-      marginheight="0" 
-      marginwidth="0">
-      Loading…
-    </iframe>
+      width="100%" height="800" frameborder="0">Loading…</iframe>
   </section>
 
   <script>
-    // Update logo img src from localStorage or fallback to default
     const logoImg = document.getElementById('logo-img');
     const storedLogoUrl = localStorage.getItem('logoURL');
     if (storedLogoUrl && storedLogoUrl.trim() !== '') {
       logoImg.src = storedLogoUrl;
     }
 
-    // Update About section text from localStorage
     const aboutTextElem = document.getElementById('about-text');
     const storedAbout = localStorage.getItem('aboutText');
     if (storedAbout && storedAbout.trim() !== '') {
       aboutTextElem.textContent = storedAbout;
     }
 
-    // Update Upcoming Shows from localStorage with line breaks
     const upcomingShowsElem = document.getElementById('upcoming-shows');
     const storedShows = localStorage.getItem('showsList');
     if (storedShows && storedShows.trim() !== '') {
       upcomingShowsElem.innerHTML = storedShows.replace(/\n/g, '<br>');
     }
 
-    // Load videos from localStorage or use default videos
     const defaultVideos = [
       "https://www.youtube.com/embed/ycCKV5uYKSE",
       "https://www.youtube.com/embed/O-PhaZvzlYw"
@@ -112,7 +89,6 @@
 
     const videoGrid = document.getElementById('video-grid');
     videoGrid.innerHTML = '';
-
     videoUrls.forEach(url => {
       const iframe = document.createElement('iframe');
       iframe.src = url;
@@ -121,13 +97,26 @@
       videoGrid.appendChild(iframe);
     });
 
-    // Smooth scroll to sections
     function scrollToSection(sectionId) {
       const section = document.getElementById(sectionId.toLowerCase());
       if (section) {
         section.scrollIntoView({ behavior: 'smooth' });
       }
     }
+
+    // Listen for updates from other tabs
+window.addEventListener('storage', (e) => {
+  if (e.key === 'lastUpdate') {
+    location.reload();
+  }
+});
+
+    const channel = new BroadcastChannel('site-updates');
+    channel.onmessage = (event) => {
+      if (event.data === 'refresh') {
+        location.reload();
+      }
+    };
   </script>
 
 </body>
