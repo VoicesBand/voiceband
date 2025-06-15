@@ -34,6 +34,107 @@
       padding: 16px;
     }
   </style>
+  <script>
+    // Static hardcoded data — no database calls
+    const staticData = {
+      logoURL: "images/logoGTO.jpg",
+      aboutText: `Formerly known as GTO (Good Time Oldies), Voices is a seasoned 4-piece band
+      performing around the STL Metro area. Blending live instruments and synthetic backing tracks,
+      they cover classic hits from the 60s through the 2000s — full of energy, sound, and nostalgia.
+
+      Left (Pat Downs), middle Left (Billy Presnell), Middle right (Dennis Gillam), Right (Jesse Miller).`,
+      showsList: `Please visit back soon to see when our next shows are...`,
+      videoUrls: [
+        "https://www.youtube.com/embed/ycCKV5uYKSE",
+        "https://www.youtube.com/embed/O-PhaZvzlYw"
+      ],
+      socials: [
+        { platform: "Facebook", url: "https://facebook.com/VoicesSTL" },
+        { platform: "YouTube", url: "https://youtube.com/@VoicesSTL" },
+        { platform: "TikTok" , url: "https://www.tiktok.com/@voicesbandmusic"}
+      ]
+    };
+
+    // Social media icons map
+    const socialIcons = {
+      facebook: "https://cdn-icons-png.flaticon.com/512/124/124010.png",
+      instagram: "https://cdn-icons-png.flaticon.com/512/2111/2111463.png",
+      twitter: "https://cdn-icons-png.flaticon.com/512/124/124021.png",
+      youtube: "https://cdn-icons-png.flaticon.com/512/1384/1384060.png",
+      tiktok: "https://cdn-icons-png.flaticon.com/512/3046/3046120.png"
+    };
+
+    // Update the DOM with static data
+    function updatePage() {
+      // Logo
+      const logoImg = document.getElementById('logo-img');
+      if (staticData.logoURL && staticData.logoURL.trim() !== '') {
+        logoImg.src = staticData.logoURL;
+      }
+
+      // About Text
+      const aboutTextElem = document.getElementById('about-text');
+      if (staticData.aboutText && staticData.aboutText.trim() !== '') {
+        aboutTextElem.textContent = staticData.aboutText;
+      }
+
+      // Upcoming Shows
+      const upcomingShowsElem = document.getElementById('upcoming-shows');
+      if (staticData.showsList && staticData.showsList.trim() !== '') {
+        upcomingShowsElem.innerHTML = staticData.showsList.replace(/\n/g, '<br>');
+      } else {
+        upcomingShowsElem.textContent = 'No upcoming shows currently.';
+      }
+
+      // Videos
+      const videoGrid = document.getElementById('video-grid');
+      videoGrid.innerHTML = '';
+      staticData.videoUrls.forEach(url => {
+        const iframe = document.createElement('iframe');
+        iframe.src = url;
+        iframe.allowFullscreen = true;
+        iframe.setAttribute('frameborder', '0');
+        videoGrid.appendChild(iframe);
+      });
+
+      // Socials
+      const socialLinksContainer = document.getElementById('social-links');
+      socialLinksContainer.innerHTML = '';
+      if (!staticData.socials || staticData.socials.length === 0) {
+        socialLinksContainer.textContent = 'No social links available.';
+      } else {
+        staticData.socials.forEach(({ platform, url }) => {
+          if (platform && url) {
+            const div = document.createElement('div');
+            div.className = 'social-link';
+
+            const img = document.createElement('img');
+            img.src = socialIcons[platform.toLowerCase()] || '';
+            img.alt = platform + " logo";
+
+            const link = document.createElement('a');
+            link.href = url;
+            link.target = "_blank";
+            link.textContent = url;
+
+            div.appendChild(img);
+            div.appendChild(link);
+            socialLinksContainer.appendChild(div);
+          }
+        });
+      }
+    }
+
+    // Smooth scroll helper
+    function scrollToSection(sectionId) {
+      const section = document.getElementById(sectionId.toLowerCase());
+      if (section) {
+        section.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+
+    window.onload = updatePage;
+  </script>
 </head>
 <body>
 
@@ -61,11 +162,7 @@
   <section id="about">
     <h2>🎤 Voices</h2>
     <p id="about-text">
-      Formerly known as GTO (Good Time Oldies), Voices is a seasoned 4-piece band
-      performing around the STL Metro area. Blending live instruments and synthetic backing tracks,
-      they cover classic hits from the 60s through the 2000s — full of energy, sound, and nostalgia.
-
-      Left (Pat Downs), middle Left (Billy Presnell), Middle right (Dennis Gillam), Right (Jesse Miller).
+      <!-- Filled by JS -->
     </p>
   </section>
 
@@ -105,153 +202,6 @@
       <!-- Social links will be populated here -->
     </div>
   </section>
-
-  <script>
-    // Social media icons for platforms
-    const socialIcons = {
-      facebook: "https://cdn-icons-png.flaticon.com/512/124/124010.png",
-      instagram: "https://cdn-icons-png.flaticon.com/512/2111/2111463.png",
-      twitter: "https://cdn-icons-png.flaticon.com/512/124/124021.png",
-      youtube: "https://cdn-icons-png.flaticon.com/512/1384/1384060.png",
-      tiktok: "https://cdn-icons-png.flaticon.com/512/3046/3046120.png"
-    };
-
-    // --- Load data from Vercel API and update page ---
-    async function loadData() {
-      try {
-        const res = await fetch('/api/data');
-        if (res.ok) {
-          const data = await res.json();
-
-          // Logo
-          if (data.logoURL && data.logoURL.trim() !== '') {
-            document.getElementById('logo-img').src = data.logoURL;
-          }
-
-          // About Text
-          if (data.aboutText && data.aboutText.trim() !== '') {
-            document.getElementById('about-text').textContent = data.aboutText;
-          }
-
-          // Upcoming Shows
-          if (data.showsList && data.showsList.trim() !== '') {
-            document.getElementById('upcoming-shows').innerHTML = data.showsList.replace(/\n/g, '<br>');
-          }
-
-          // Videos
-          const videoGrid = document.getElementById('video-grid');
-          videoGrid.innerHTML = '';
-          const videos = Array.isArray(data.videoUrls) && data.videoUrls.length > 0 
-            ? data.videoUrls 
-            : [
-                "https://www.youtube.com/embed/ycCKV5uYKSE",
-                "https://www.youtube.com/embed/O-PhaZvzlYw"
-              ];
-          videos.forEach(url => {
-            const iframe = document.createElement('iframe');
-            iframe.src = url;
-            iframe.allowFullscreen = true;
-            iframe.setAttribute('frameborder', '0');
-            videoGrid.appendChild(iframe);
-          });
-
-          // Social Links
-          const socials = Array.isArray(data.socials) ? data.socials : [];
-          const socialLinksContainer = document.getElementById('social-links');
-          socialLinksContainer.innerHTML = '';
-          if (socials.length === 0) {
-            socialLinksContainer.textContent = 'No social links available.';
-          } else {
-            socials.forEach(({ platform, url }) => {
-              if (platform && url) {
-                const div = document.createElement('div');
-                div.className = 'social-link';
-
-                const img = document.createElement('img');
-                img.src = socialIcons[platform.toLowerCase()] || '';
-                img.alt = platform + " logo";
-
-                const link = document.createElement('a');
-                link.href = url;
-                link.target = "_blank";
-                link.textContent = url;
-
-                div.appendChild(img);
-                div.appendChild(link);
-                socialLinksContainer.appendChild(div);
-              }
-            });
-          }
-        } else {
-          console.error('Failed to fetch data from API', res.status);
-        }
-      } catch (e) {
-        console.error('Error loading data:', e);
-      }
-    }
-
-    loadData();
-
-    // Smooth scroll to sections
-    function scrollToSection(sectionId) {
-      const section = document.getElementById(sectionId.toLowerCase());
-      if (section) {
-        section.scrollIntoView({ behavior: 'smooth' });
-      }
-    }
-
-    // Auto reload logic for tabs with similar URLs (about, shows, gallery, socials)
-    const urlBase = window.location.origin + window.location.pathname;
-
-    function reloadIfUrlMatches() {
-      const openTabs = [...window.openedTabs || []];
-      openTabs.forEach(tab => {
-        try {
-          const tabUrl = tab.location.href;
-          if (tabUrl.startsWith(urlBase)) {
-            tab.location.reload();
-          }
-        } catch (e) {
-          // cross origin or closed tab error, ignore
-        }
-      });
-    }
-
-    // Hook this to your admin save action to trigger reload on other tabs
-    // For demonstration, we'll just listen for storage event (can be removed if handled elsewhere)
-    window.addEventListener('storage', (e) => {
-      if (e.key === 'socials' || e.key === 'videoUrls' || e.key === 'showsList' || e.key === 'aboutText') {
-        reloadIfUrlMatches();
-      }
-    });
-
-    // --- Save data to Vercel API ---
-    // You can call saveData(newData) from your admin page or any save button
-    async function saveData(newData) {
-      try {
-        const res = await fetch('/api/data', {
-          method: 'POST',
-          headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify(newData)
-        });
-        if (res.ok) {
-          console.log('Data saved successfully');
-          // Optionally reload after save to update UI everywhere
-          loadData();
-        } else {
-          console.error('Failed to save data', res.status);
-        }
-      } catch (e) {
-        console.error('Error saving data:', e);
-      }
-    }
-
-    // Expose saveData globally so admin can call it
-    window.saveData = saveData;
-
-    // Optional: Poll every 30 seconds to update page data across sessions
-    setInterval(loadData, 30000);
-  </script>
 
 </body>
 </html>

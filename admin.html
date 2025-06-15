@@ -1,187 +1,165 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Admin Panel - Voices</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Voices Admin</title>
   <style>
-    body {
-      padding: 20px;
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    #home-btn {
+      position: static;
+      top: 6px;
+      left: 6px;
+      padding: 8px 15px;
+      font-size: 14px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      z-index: 4000;
+    }
+    label { display: block; margin-top: 15px; }
+    input[type="text"], textarea, select {
+      width: 100%;
+      padding: 8px;
+      font-size: 14px;
+      margin-top: 5px;
+      box-sizing: border-box;
+      background: #f4f4f4;
+      border: 1px solid #ccc;
+      color: #555;
+    }
+    input[readonly], textarea[readonly], select[disabled] {
+      background: #eee;
+      color: #333;
+      cursor: default;
     }
     h2 {
       margin-top: 40px;
     }
-    label {
-      display: block;
+    table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+    th { background-color: #f4f4f4; }
+    #bookings-container { margin-top: 20px; }
+    #admin-content { display: none; }
+
+    /* Socials admin display styling */
+    .social-entry {
+      display: flex;
+      gap: 10px;
+      align-items: center;
       margin-top: 10px;
     }
-    input[type="text"], textarea, select {
-      width: 100%;
-      padding: 8px;
-      margin-top: 4px;
-      box-sizing: border-box;
-    }
-    button {
-      margin-top: 12px;
-      padding: 10px 20px;
-      font-weight: bold;
-    }
-    .video-item, .social-item {
-      display: flex;
-      gap: 8px;
-      margin-top: 8px;
-    }
-    .video-item input,
-    .social-item input,
-    .social-item select {
+    .social-entry select, .social-entry input[type="text"] {
       flex: 1;
     }
   </style>
 </head>
 <body>
 
-  <h1>Admin Panel - Update Website Content</h1>
+  <!-- Password login screen -->
+  <div id="login-screen">
+    <h2>Admin Login</h2>
+    <label for="password">Enter password:</label>
+    <input type="password" id="password" autocomplete="off" />
+    <button id="login-btn">Login</button>
+    <p id="login-error" style="color:red;"></p>
+  </div>
 
-  <!-- Logo URL -->
-  <h2>Logo URL</h2>
-  <label for="logo-url">Image URL:</label>
-  <input type="text" id="logo-url" />
-  <button onclick="saveLogo()">Save Logo</button>
+  <!-- Admin dashboard content -->
+  <div id="admin-content">
 
-  <!-- About Section -->
-  <h2>About Text</h2>
-  <textarea id="about-text" rows="5"></textarea>
-  <button onclick="saveAbout()">Save About</button>
+    <button id="home-btn" onclick="location.href='index.html'">Home</button>
 
-  <!-- Shows Section -->
-  <h2>Upcoming Shows</h2>
-  <textarea id="shows-list" rows="5"></textarea>
-  <button onclick="saveShows()">Save Shows</button>
+    <h1>Voices Admin Dashboard</h1>
 
-  <!-- Videos -->
-  <h2>Videos</h2>
-  <div id="video-list"></div>
-  <button onclick="addVideo()">Add Video</button>
-  <button onclick="saveVideos()">Save Videos</button>
+    <!-- Video URLs Display -->
+    <div id="video-url-editor">
+      <h2>🎬 Video URLs</h2>
+      <div id="video-inputs">
+        <input type="text" value="https://www.youtube.com/embed/dQw4w9WgXcQ" readonly />
+        <input type="text" value="https://www.youtube.com/embed/3JZ_D3ELwOQ" readonly />
+      </div>
+    </div>
 
-  <!-- Socials -->
-  <h2>Social Links</h2>
-  <div id="social-list"></div>
-  <button onclick="addSocial()">Add Social</button>
-  <button onclick="saveSocials()">Save Socials</button>
+    <!-- About Voices Display -->
+    <div id="about-editor">
+      <h2>📝 "About Voices" Section</h2>
+      <textarea id="about-text" rows="6" readonly>
+Voices is a band based in STL with decades of touring experience. We love to perform classic oldies and good time hits!
+      </textarea>
+    </div>
 
-  <script>
-    // Load existing data into fields
-    document.getElementById('logo-url').value = localStorage.getItem('logoURL') || '';
-    document.getElementById('about-text').value = localStorage.getItem('aboutText') || '';
-    document.getElementById('shows-list').value = localStorage.getItem('showsList') || '';
+    <!-- Upcoming Shows Display -->
+    <div id="shows-editor">
+      <h2>📅 Upcoming Shows</h2>
+      <textarea id="shows-list" rows="6" readonly>
+July 20 – The Pageant STL
+August 15 – The Ready Room
+September 10 – Local Fest
+      </textarea>
+    </div>
 
-    function saveLogo() {
-      const url = document.getElementById('logo-url').value;
-      localStorage.setItem('logoURL', url);
-      alert('Logo saved!');
-    }
+    <!-- Logo URL Display -->
+    <div id="logo-editor">
+      <h2>🖼️ Logo URL (Top Left)</h2>
+      <input id="logo-url" type="text" value="https://example.com/logo.png" readonly />
+    </div>
 
-    function saveAbout() {
-      const text = document.getElementById('about-text').value;
-      localStorage.setItem('aboutText', text);
-      alert('About text saved!');
-    }
-
-    function saveShows() {
-      const text = document.getElementById('shows-list').value;
-      localStorage.setItem('showsList', text);
-      alert('Shows list saved!');
-    }
-
-    // --- Video Logic ---
-    function loadVideos() {
-      const list = document.getElementById('video-list');
-      list.innerHTML = '';
-      const videos = JSON.parse(localStorage.getItem('videoUrls')) || [];
-      videos.forEach((url, i) => {
-        const div = document.createElement('div');
-        div.className = 'video-item';
-        div.innerHTML = `
-          <input type="text" value="${url}" data-index="${i}" />
-          <button onclick="removeVideo(${i})">Remove</button>
-        `;
-        list.appendChild(div);
-      });
-    }
-
-    function addVideo() {
-      const videos = JSON.parse(localStorage.getItem('videoUrls')) || [];
-      videos.push('');
-      localStorage.setItem('videoUrls', JSON.stringify(videos));
-      loadVideos();
-    }
-
-    function removeVideo(index) {
-      const videos = JSON.parse(localStorage.getItem('videoUrls')) || [];
-      videos.splice(index, 1);
-      localStorage.setItem('videoUrls', JSON.stringify(videos));
-      loadVideos();
-    }
-
-    function saveVideos() {
-      const inputs = document.querySelectorAll('.video-item input');
-      const urls = Array.from(inputs).map(input => input.value).filter(v => v.trim() !== '');
-      localStorage.setItem('videoUrls', JSON.stringify(urls));
-      alert('Videos saved!');
-    }
-
-    // --- Socials Logic ---
-    const platforms = ['facebook', 'instagram', 'twitter', 'youtube', 'tiktok'];
-
-    function loadSocials() {
-      const list = document.getElementById('social-list');
-      list.innerHTML = '';
-      const socials = JSON.parse(localStorage.getItem('socials')) || [];
-      socials.forEach(({ platform, url }, i) => {
-        const div = document.createElement('div');
-        div.className = 'social-item';
-        div.innerHTML = `
-          <select data-index="${i}">
-            ${platforms.map(p => `<option value="${p}" ${p === platform ? 'selected' : ''}>${p}</option>`).join('')}
+    <!-- Socials Display -->
+    <div id="socials-editor">
+      <h2>🔗 Social Links</h2>
+      <div id="social-inputs">
+        <div class="social-entry">
+          <select disabled>
+            <option>Facebook</option>
           </select>
-          <input type="text" value="${url}" data-index="${i}" />
-          <button onclick="removeSocial(${i})">Remove</button>
-        `;
-        list.appendChild(div);
-      });
-    }
+          <input type="text" value="https://facebook.com/VoicesSTL" readonly />
+        </div>
+        <div class="social-entry">
+          <select disabled>
+            <option>Instagram</option>
+          </select>
+          <input type="text" value="https://instagram.com/VoicesSTL" readonly />
+        </div>
+        <div class="social-entry">
+          <select disabled>
+            <option>YouTube</option>
+          </select>
+          <input type="text" value="https://youtube.com/VoicesSTL" readonly />
+        </div>
+      </div>
+    </div>
 
-    function addSocial() {
-      const socials = JSON.parse(localStorage.getItem('socials')) || [];
-      socials.push({ platform: 'facebook', url: '' });
-      localStorage.setItem('socials', JSON.stringify(socials));
-      loadSocials();
-    }
+    <!-- Booking Sheet Link -->
+    <div class="section" id="bookings-container">
+      <h2>📄 Booking Spreadsheet</h2>
+      <a href="https://docs.google.com/spreadsheets/d/1Fucpvl0eNb2WfAirA2suqLIQLYjjJ5v68W7Z4WD95_E/edit#gid=807357404" target="_blank">
+        Open Booking Google Sheet
+      </a>
+    </div>
 
-    function removeSocial(index) {
-      const socials = JSON.parse(localStorage.getItem('socials')) || [];
-      socials.splice(index, 1);
-      localStorage.setItem('socials', JSON.stringify(socials));
-      loadSocials();
-    }
+  </div>
 
-    function saveSocials() {
-      const selects = document.querySelectorAll('.social-item select');
-      const inputs = document.querySelectorAll('.social-item input');
-      const socials = Array.from(selects).map((sel, i) => ({
-        platform: sel.value,
-        url: inputs[i].value
-      })).filter(s => s.url.trim() !== '');
-      localStorage.setItem('socials', JSON.stringify(socials));
-      alert('Socials saved!');
-    }
+<script>
+  const correctPassword = 'test123'; // Replace with your password
 
-    // Load everything
-    loadVideos();
-    loadSocials();
-  </script>
+  const loginScreen = document.getElementById('login-screen');
+  const adminContent = document.getElementById('admin-content');
+  const loginBtn = document.getElementById('login-btn');
+  const loginError = document.getElementById('login-error');
+
+  loginBtn.addEventListener('click', () => {
+    const pwd = document.getElementById('password').value;
+    if (pwd === correctPassword) {
+      loginScreen.style.display = 'none';
+      adminContent.style.display = 'block';
+    } else {
+      loginError.textContent = 'Incorrect password, please try again.';
+    }
+  });
+</script>
 
 </body>
 </html>
