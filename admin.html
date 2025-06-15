@@ -85,116 +85,159 @@
   </div>
 
   <script>
-    const PASSWORD = 'test123';
-    const loginScreen = document.getElementById('login-screen');
-    const adminContent = document.getElementById('admin-content');
-    const loginBtn = document.getElementById('login-btn');
-    const loginError = document.getElementById('login-error');
+  const PASSWORD = 'test123';
+  const loginScreen = document.getElementById('login-screen');
+  const adminContent = document.getElementById('admin-content');
+  const loginBtn = document.getElementById('login-btn');
+  const loginError = document.getElementById('login-error');
 
-    loginBtn.addEventListener('click', () => {
-      const entered = document.getElementById('password').value;
-      if (entered === PASSWORD) {
-        loginScreen.style.display = 'none';
-        adminContent.style.display = 'block';
-      } else {
-        loginError.textContent = 'Incorrect password, please try again.';
-      }
+  loginBtn.addEventListener('click', () => {
+    const entered = document.getElementById('password').value;
+    if (entered === PASSWORD) {
+      loginScreen.style.display = 'none';
+      adminContent.style.display = 'block';
+      loadContent();  // Load content after successful login
+    } else {
+      loginError.textContent = 'Incorrect password, please try again.';
+    }
+  });
+
+  // GitHub repo info — **CHANGE these to your values!**
+  const repoOwner = 'VoicesBand';
+  const repoName = 'voiceband';
+  const filePath = 'content.json';
+
+  const videoInputsContainer = document.getElementById('video-inputs');
+  const addVideoBtn = document.getElementById('add-video-btn');
+  const saveVideosBtn = document.getElementById('save-videos-btn');
+  const videoSaveStatus = document.getElementById('video-save-status');
+
+  let videoUrls = [];
+
+  function renderVideoInputs() {
+    videoInputsContainer.innerHTML = '';
+    videoUrls.forEach((url, i) => {
+      const div = document.createElement('div');
+      div.innerHTML = `
+        <label>Video URL ${i + 1}:
+          <input type="text" value="${url}" data-index="${i}" />
+          <button data-index="${i}" class="remove-btn" style="margin-left:10px;">Remove</button>
+        </label>
+      `;
+      videoInputsContainer.appendChild(div);
     });
 
-    window.onload = () => {
-      videoUrls = JSON.parse(localStorage.getItem('videoUrls')) || [
-        "https://www.youtube.com/embed/ycCKV5uYKSE",
-        "https://www.youtube.com/embed/O-PhaZvzlYw"
-      ];
-      renderVideoInputs();
+    document.querySelectorAll('.remove-btn').forEach(btn => {
+      btn.addEventListener('click', e => {
+        const idx = e.target.getAttribute('data-index');
+        videoUrls.splice(idx, 1);
+        renderVideoInputs();
+      });
+    });
 
-      document.getElementById('about-text').value = localStorage.getItem('aboutText') || '';
-      document.getElementById('shows-list').value = localStorage.getItem('showsList') || '';
-      document.getElementById('logo-url').value = localStorage.getItem('logoURL') || '';
+    videoInputsContainer.querySelectorAll('input[type="text"]').forEach(input => {
+      input.addEventListener('input', e => {
+        const idx = e.target.getAttribute('data-index');
+        videoUrls[idx] = e.target.value;
+      });
+    });
+  }
+
+  addVideoBtn.addEventListener('click', () => {
+    videoUrls.push('');
+    renderVideoInputs();
+  });
+
+  // Load content.json from GitHub and populate form fields
+  async function loadContent() {
+    try {
+      const res = await fetch(`https://raw.githubusercontent.com/VoicesBand/voiceband/main/content.json`);
+      if (!res.ok) throw new Error('Failed to load content.json');
+      const data = await res.json();
+
+      document.getElementById('about-text').value = data.aboutText || '';
+      document.getElementById('shows-list').value = data.showsList || '';
+      document.getElementById('logo-url').value = data.logoURL || '';
+      videoUrls = data.videoUrls || [];
+      renderVideoInputs();
+    } catch (err) {
+      alert('Error loading content from GitHub: ' + err.message);
+    }
+  }
+
+  // Save all form data to GitHub content.json using API
+  async function saveAll() {
+    const token = prompt('Enter your GitHub Personal Access Token (with repo permissions)');
+    if (!token) {
+      alert('GitHub token is required to save changes.');
+      return;
+    }
+
+    const updatedData = {
+      aboutText: document.getElementById('about-text').value,
+      showsList: document.getElementById('shows-list').value,
+      logoURL: document.getElementById('logo-url').value,
+      videoUrls: videoUrls
     };
 
-    const videoInputsContainer = document.getElementById('video-inputs');
-    const addVideoBtn = document.getElementById('add-video-btn');
-    const saveVideosBtn = document.getElementById('save-videos-btn');
-    const videoSaveStatus = document.getElementById('video-save-status');
+    try {
+      // Get current file SHA for update
+      const getRes = await fetch(`https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filePath}`, {
+        headers: { Authorization: `token ${token}` }
+      });
+      if (!getRes.ok) throw new Error('Failed to get file info from GitHub');
+      const fileData = await getRes.json();
 
-    let videoUrls = [];
+      // Base64 encode content
+      const contentBase64 = btoa(unescape(encodeURIComponent(JSON.stringify(updatedData, null, 2))));
 
-    function renderVideoInputs() {
-      videoInputsContainer.innerHTML = '';
-      videoUrls.forEach((url, i) => {
-        const div = document.createElement('div');
-        div.innerHTML = `
-          <label>Video URL ${i + 1}:
-            <input type="text" value="${url}" data-index="${i}" />
-            <button data-index="${i}" class="remove-btn" style="margin-left:10px;">Remove</button>
-          </label>
-        `;
-        videoInputsContainer.appendChild(div);
+      // Commit update
+      const putRes = await fetch(`https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filePath}`, {
+        method: 'PUT',
+        headers: {
+          Authorization: `token ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          message: 'Update site content via admin panel',
+          content: contentBase64,
+          sha: fileData.sha
+        })
       });
 
-      document.querySelectorAll('.remove-btn').forEach(btn => {
-        btn.addEventListener('click', e => {
-          const idx = e.target.getAttribute('data-index');
-          videoUrls.splice(idx, 1);
-          renderVideoInputs();
-        });
-      });
-
-      videoInputsContainer.querySelectorAll('input[type="text"]').forEach(input => {
-        input.addEventListener('input', e => {
-          const idx = e.target.getAttribute('data-index');
-          videoUrls[idx] = e.target.value;
-        });
-      });
-    }
-
-    addVideoBtn.addEventListener('click', () => {
-      videoUrls.push('');
-      renderVideoInputs();
-    });
-
-    saveVideosBtn.addEventListener('click', () => {
-      if (videoUrls.some(url => url.trim() === '')) {
-        videoSaveStatus.textContent = 'Please fill in all video URLs or remove empty ones.';
-        videoSaveStatus.style.color = 'red';
-        return;
+      if (!putRes.ok) {
+        const errorData = await putRes.json();
+        throw new Error(errorData.message || 'Failed to update content');
       }
-      localStorage.setItem('videoUrls', JSON.stringify(videoUrls));
-      localStorage.setItem('lastUpdate', Date.now());  // Trigger update
-      videoSaveStatus.textContent = 'Video URLs saved successfully!';
-      videoSaveStatus.style.color = 'green';
-    });
 
-    function saveAbout() {
-      const text = document.getElementById('about-text').value;
-      localStorage.setItem('aboutText', text);
-      localStorage.setItem('lastUpdate', Date.now());
-      const status = document.getElementById('about-save-status');
-      status.textContent = 'About section updated!';
-      status.style.color = 'green';
-      setTimeout(() => { status.textContent = ''; }, 3000);
+      alert('Content updated successfully!');
+      await loadContent(); // Refresh form with latest data
+    } catch (err) {
+      alert('Error updating content: ' + err.message);
     }
+  }
 
-    function saveShows() {
-      const text = document.getElementById('shows-list').value;
-      localStorage.setItem('showsList', text);
-      localStorage.setItem('lastUpdate', Date.now());
-      const status = document.getElementById('shows-save-status');
-      status.textContent = 'Shows updated!';
-      status.style.color = 'green';
-      setTimeout(() => { status.textContent = ''; }, 3000);
+  // Override existing save button handlers to use GitHub API saveAll
+  saveVideosBtn.addEventListener('click', () => {
+    if (videoUrls.some(url => url.trim() === '')) {
+      videoSaveStatus.textContent = 'Please fill in all video URLs or remove empty ones.';
+      videoSaveStatus.style.color = 'red';
+      return;
     }
+    saveAll();
+  });
 
-    function saveLogo() {
-      const url = document.getElementById('logo-url').value;
-      localStorage.setItem('logoURL', url);
-      localStorage.setItem('lastUpdate', Date.now());
-      const status = document.getElementById('logo-save-status');
-      status.textContent = 'Logo URL updated!';
-      status.style.color = 'green';
-      setTimeout(() => { status.textContent = ''; }, 3000);
-    }
-  </script>
+  function saveAbout() {
+    saveAll();
+  }
+
+  function saveShows() {
+    saveAll();
+  }
+
+  function saveLogo() {
+    saveAll();
+  }
+</script>
 </body>
 </html>

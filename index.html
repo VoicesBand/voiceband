@@ -63,53 +63,46 @@
   </section>
 
   <script>
-    const logoImg = document.getElementById('logo-img');
-    const storedLogoUrl = localStorage.getItem('logoURL');
-    if (storedLogoUrl && storedLogoUrl.trim() !== '') {
-      logoImg.src = storedLogoUrl;
+  async function loadContent() {
+    try {
+      const res = await fetch('content.json');
+      if (!res.ok) throw new Error('Failed to load content.json');
+      const data = await res.json();
+
+      // Update About Text
+      const aboutTextElem = document.getElementById('about-text');
+      aboutTextElem.textContent = data.aboutText || '';
+
+      // Update Shows
+      const upcomingShowsElem = document.getElementById('upcoming-shows');
+      upcomingShowsElem.innerHTML = (data.showsList || '').replace(/\n/g, '<br>');
+
+      // Update Logo
+      const logoImg = document.getElementById('logo-img');
+      logoImg.src = data.logoURL || 'images/logoGTO.jpg';
+
+      // Update Videos
+      const videoGrid = document.getElementById('video-grid');
+      videoGrid.innerHTML = '';
+      (data.videoUrls || []).forEach(url => {
+        const iframe = document.createElement('iframe');
+        iframe.src = url;
+        iframe.allowFullscreen = true;
+        iframe.setAttribute('frameborder', '0');
+        videoGrid.appendChild(iframe);
+      });
+    } catch (err) {
+      console.error('Error loading content:', err);
     }
-
-    const aboutTextElem = document.getElementById('about-text');
-    const storedAbout = localStorage.getItem('aboutText');
-    if (storedAbout && storedAbout.trim() !== '') {
-      aboutTextElem.textContent = storedAbout;
-    }
-
-    const upcomingShowsElem = document.getElementById('upcoming-shows');
-    const storedShows = localStorage.getItem('showsList');
-    if (storedShows && storedShows.trim() !== '') {
-      upcomingShowsElem.innerHTML = storedShows.replace(/\n/g, '<br>');
-    }
-
-    const defaultVideos = [
-      "https://www.youtube.com/embed/ycCKV5uYKSE",
-      "https://www.youtube.com/embed/O-PhaZvzlYw"
-    ];
-    const videoUrls = JSON.parse(localStorage.getItem('videoUrls')) || defaultVideos;
-
-    const videoGrid = document.getElementById('video-grid');
-    videoGrid.innerHTML = '';
-    videoUrls.forEach(url => {
-      const iframe = document.createElement('iframe');
-      iframe.src = url;
-      iframe.allowFullscreen = true;
-      iframe.setAttribute('frameborder', '0');
-      videoGrid.appendChild(iframe);
-    });
-
-    function scrollToSection(sectionId) {
-      const section = document.getElementById(sectionId.toLowerCase());
-      if (section) {
-        section.scrollIntoView({ behavior: 'smooth' });
-      }
-    }
-
-    // Listen for updates from other tabs
-window.addEventListener('storage', (e) => {
-  if (e.key === 'lastUpdate') {
-    location.reload();
   }
-});
+
+  loadContent();
+
+  function scrollToSection(sectionId) {
+    const section = document.getElementById(sectionId.toLowerCase());
+    if (section) section.scrollIntoView({ behavior: 'smooth' });
+  }
+</script>
 
     const channel = new BroadcastChannel('site-updates');
     channel.onmessage = (event) => {
