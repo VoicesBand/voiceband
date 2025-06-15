@@ -107,45 +107,6 @@
   </section>
 
   <script>
-    // Update logo img src from localStorage or fallback to default
-    const logoImg = document.getElementById('logo-img');
-    const storedLogoUrl = localStorage.getItem('logoURL');
-    if (storedLogoUrl && storedLogoUrl.trim() !== '') {
-      logoImg.src = storedLogoUrl;
-    }
-
-    // Update About section text from localStorage
-    const aboutTextElem = document.getElementById('about-text');
-    const storedAbout = localStorage.getItem('aboutText');
-    if (storedAbout && storedAbout.trim() !== '') {
-      aboutTextElem.textContent = storedAbout;
-    }
-
-    // Update Upcoming Shows from localStorage with line breaks
-    const upcomingShowsElem = document.getElementById('upcoming-shows');
-    const storedShows = localStorage.getItem('showsList');
-    if (storedShows && storedShows.trim() !== '') {
-      upcomingShowsElem.innerHTML = storedShows.replace(/\n/g, '<br>');
-    }
-
-    // Load videos from localStorage or use default videos
-    const defaultVideos = [
-      "https://www.youtube.com/embed/ycCKV5uYKSE",
-      "https://www.youtube.com/embed/O-PhaZvzlYw"
-    ];
-    const videoUrls = JSON.parse(localStorage.getItem('videoUrls')) || defaultVideos;
-
-    const videoGrid = document.getElementById('video-grid');
-    videoGrid.innerHTML = '';
-
-    videoUrls.forEach(url => {
-      const iframe = document.createElement('iframe');
-      iframe.src = url;
-      iframe.allowFullscreen = true;
-      iframe.setAttribute('frameborder', '0');
-      videoGrid.appendChild(iframe);
-    });
-
     // Social media icons for platforms
     const socialIcons = {
       facebook: "https://cdn-icons-png.flaticon.com/512/124/124010.png",
@@ -155,34 +116,81 @@
       tiktok: "https://cdn-icons-png.flaticon.com/512/3046/3046120.png"
     };
 
-    // Load socials from localStorage
-    const socials = JSON.parse(localStorage.getItem('socials')) || [];
-    const socialLinksContainer = document.getElementById('social-links');
+    // --- Load data from Vercel API and update page ---
+    async function loadData() {
+      try {
+        const res = await fetch('/api/data');
+        if (res.ok) {
+          const data = await res.json();
 
-    socialLinksContainer.innerHTML = '';
-    if (socials.length === 0) {
-      socialLinksContainer.textContent = 'No social links available.';
-    } else {
-      socials.forEach(({ platform, url }) => {
-        if (platform && url) {
-          const div = document.createElement('div');
-          div.className = 'social-link';
+          // Logo
+          if (data.logoURL && data.logoURL.trim() !== '') {
+            document.getElementById('logo-img').src = data.logoURL;
+          }
 
-          const img = document.createElement('img');
-          img.src = socialIcons[platform.toLowerCase()] || '';
-          img.alt = platform + " logo";
+          // About Text
+          if (data.aboutText && data.aboutText.trim() !== '') {
+            document.getElementById('about-text').textContent = data.aboutText;
+          }
 
-          const link = document.createElement('a');
-          link.href = url;
-          link.target = "_blank";
-          link.textContent = url;
+          // Upcoming Shows
+          if (data.showsList && data.showsList.trim() !== '') {
+            document.getElementById('upcoming-shows').innerHTML = data.showsList.replace(/\n/g, '<br>');
+          }
 
-          div.appendChild(img);
-          div.appendChild(link);
-          socialLinksContainer.appendChild(div);
+          // Videos
+          const videoGrid = document.getElementById('video-grid');
+          videoGrid.innerHTML = '';
+          const videos = Array.isArray(data.videoUrls) && data.videoUrls.length > 0 
+            ? data.videoUrls 
+            : [
+                "https://www.youtube.com/embed/ycCKV5uYKSE",
+                "https://www.youtube.com/embed/O-PhaZvzlYw"
+              ];
+          videos.forEach(url => {
+            const iframe = document.createElement('iframe');
+            iframe.src = url;
+            iframe.allowFullscreen = true;
+            iframe.setAttribute('frameborder', '0');
+            videoGrid.appendChild(iframe);
+          });
+
+          // Social Links
+          const socials = Array.isArray(data.socials) ? data.socials : [];
+          const socialLinksContainer = document.getElementById('social-links');
+          socialLinksContainer.innerHTML = '';
+          if (socials.length === 0) {
+            socialLinksContainer.textContent = 'No social links available.';
+          } else {
+            socials.forEach(({ platform, url }) => {
+              if (platform && url) {
+                const div = document.createElement('div');
+                div.className = 'social-link';
+
+                const img = document.createElement('img');
+                img.src = socialIcons[platform.toLowerCase()] || '';
+                img.alt = platform + " logo";
+
+                const link = document.createElement('a');
+                link.href = url;
+                link.target = "_blank";
+                link.textContent = url;
+
+                div.appendChild(img);
+                div.appendChild(link);
+                socialLinksContainer.appendChild(div);
+              }
+            });
+          }
+        } else {
+          console.error('Failed to fetch data from API', res.status);
         }
-      });
+      } catch (e) {
+        console.error('Error loading data:', e);
+      }
     }
+
+    loadData();
 
     // Smooth scroll to sections
     function scrollToSection(sectionId) {
@@ -217,6 +225,32 @@
       }
     });
 
+    // --- Save data to Vercel API ---
+    // You can call saveData(newData) from your admin page or any save button
+    async function saveData(newData) {
+      try {
+        const res = await fetch('/api/data', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(newData)
+        });
+        if (res.ok) {
+          console.log('Data saved successfully');
+          // Optionally reload after save to update UI everywhere
+          loadData();
+        } else {
+          console.error('Failed to save data', res.status);
+        }
+      } catch (e) {
+        console.error('Error saving data:', e);
+      }
+    }
+
+    // Expose saveData globally so admin can call it
+    window.saveData = saveData;
+
+    // Optional: Poll every 30 seconds to update page data across sessions
+    setInterval(loadData, 30000);
   </script>
 
 </body>

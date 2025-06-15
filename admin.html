@@ -2,336 +2,186 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Voices Admin</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Panel - Voices</title>
+  <link rel="stylesheet" href="style.css" />
   <style>
-    body { font-family: Arial, sans-serif; padding: 20px; }
-    #home-btn {
-      position: static;
-      top: 6px;
-      left: 6px;
-      padding: 8px 15px;
-      font-size: 14px;
-      background-color: #007bff;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      z-index: 4000;
+    body {
+      padding: 20px;
     }
-    label { display: block; margin-top: 15px; }
-    input[type="text"], input[type="password"], textarea, select {
-      width: 100%;
-      padding: 8px;
-      font-size: 14px;
-      margin-top: 5px;
-      box-sizing: border-box;
+    h2 {
+      margin-top: 40px;
     }
-    button { margin-top: 20px; padding: 10px 20px; font-size: 16px; cursor: pointer; }
-    table { border-collapse: collapse; width: 100%; margin-top: 20px; }
-    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
-    th { background-color: #f4f4f4; }
-    #bookings-container { margin-top: 20px; }
-    #admin-content { display: none; }
-
-    /* Socials admin inputs styling */
-    .social-entry {
-      display: flex;
-      gap: 10px;
-      align-items: center;
+    label {
+      display: block;
       margin-top: 10px;
     }
-    .social-entry select, .social-entry input[type="text"] {
-      flex: 1;
+    input[type="text"], textarea, select {
+      width: 100%;
+      padding: 8px;
+      margin-top: 4px;
+      box-sizing: border-box;
     }
-    .remove-social-btn {
-      background: #dc3545;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      padding: 5px 10px;
-      cursor: pointer;
+    button {
+      margin-top: 12px;
+      padding: 10px 20px;
+      font-weight: bold;
+    }
+    .video-item, .social-item {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .video-item input,
+    .social-item input,
+    .social-item select {
+      flex: 1;
     }
   </style>
 </head>
 <body>
 
-  <!-- Password login screen -->
-  <div id="login-screen">
-    <h2>Admin Login</h2>
-    <label for="password">Enter password:</label>
-    <input type="password" id="password" autocomplete="off" />
-    <button id="login-btn">Login</button>
-    <p id="login-error" style="color:red;"></p>
-  </div>
+  <h1>Admin Panel - Update Website Content</h1>
 
-  <!-- Admin dashboard content -->
-  <div id="admin-content">
-    <button id="home-btn" onclick="location.href='index.html'">Home</button>
+  <!-- Logo URL -->
+  <h2>Logo URL</h2>
+  <label for="logo-url">Image URL:</label>
+  <input type="text" id="logo-url" />
+  <button onclick="saveLogo()">Save Logo</button>
 
-    <h1>Voices Admin Dashboard</h1>
+  <!-- About Section -->
+  <h2>About Text</h2>
+  <textarea id="about-text" rows="5"></textarea>
+  <button onclick="saveAbout()">Save About</button>
 
-    <!-- Video URL Inputs -->
-    <div id="video-url-editor">
-      <h2>🎬 Manage Video URLs</h2>
-      <div id="video-inputs"></div>
-      <button id="add-video-btn">Add New Video URL</button>
-      <button id="save-videos-btn">Save Video URLs</button>
-      <p id="video-save-status"></p>
-    </div>
+  <!-- Shows Section -->
+  <h2>Upcoming Shows</h2>
+  <textarea id="shows-list" rows="5"></textarea>
+  <button onclick="saveShows()">Save Shows</button>
 
-    <!-- Editable "About Voices" Text -->
-    <div id="about-editor" style="margin-top: 40px;">
-      <h2>📝 Edit "About Voices" Section</h2>
-      <textarea id="about-text" rows="6" placeholder="Write about Voices here..."></textarea><br>
-      <button onclick="saveAbout()">Save About Section</button>
-      <p id="about-save-status"></p>
-    </div>
+  <!-- Videos -->
+  <h2>Videos</h2>
+  <div id="video-list"></div>
+  <button onclick="addVideo()">Add Video</button>
+  <button onclick="saveVideos()">Save Videos</button>
 
-    <!-- Upcoming Shows Editor -->
-    <div id="shows-editor" style="margin-top: 40px;">
-      <h2>📅 Manage Upcoming Shows</h2>
-      <textarea id="shows-list" rows="6" placeholder="e.g. July 20 – The Pageant STL"></textarea><br>
-      <button onclick="saveShows()">Save Shows</button>
-      <p id="shows-save-status"></p>
-    </div>
+  <!-- Socials -->
+  <h2>Social Links</h2>
+  <div id="social-list"></div>
+  <button onclick="addSocial()">Add Social</button>
+  <button onclick="saveSocials()">Save Socials</button>
 
-    <!-- Logo URL Changer -->
-    <div id="logo-editor" style="margin-top: 40px;">
-      <h2>🖼️ Update Logo (Top Left)</h2>
-      <input id="logo-url" type="text" placeholder="Paste image URL" style="width: 100%;"><br>
-      <button onclick="saveLogo()">Save Logo</button>
-      <p id="logo-save-status"></p>
-    </div>
+  <script>
+    // Load existing data into fields
+    document.getElementById('logo-url').value = localStorage.getItem('logoURL') || '';
+    document.getElementById('about-text').value = localStorage.getItem('aboutText') || '';
+    document.getElementById('shows-list').value = localStorage.getItem('showsList') || '';
 
-    <!-- Socials Editor -->
-    <div id="socials-editor" style="margin-top: 40px;">
-      <h2>🔗 Manage Social Links</h2>
-      <div id="social-inputs"></div>
-      <button id="add-social-btn">Add New Social Link</button>
-      <button id="save-socials-btn">Save Social Links</button>
-      <p id="socials-save-status"></p>
-    </div>
-
-    <!-- Booking Sheet -->
-    <div class="section" style="margin-top: 50px;">
-  <h2>📄 Booking Spreadsheet</h2>
-  <a href="https://docs.google.com/spreadsheets/d/1Fucpvl0eNb2WfAirA2suqLIQLYjjJ5v68W7Z4WD95_E/edit#gid=807357404" target="_blank">
-    Open Booking Google Sheet
-  </a>
-</div>
-
-<script>
-  const correctPassword = 'test123'; // Replace with your actual password
-
-  // Show or hide admin content based on login
-  const loginScreen = document.getElementById('login-screen');
-  const adminContent = document.getElementById('admin-content');
-  const loginBtn = document.getElementById('login-btn');
-  const loginError = document.getElementById('login-error');
-
-  loginBtn.addEventListener('click', () => {
-    const pwd = document.getElementById('password').value;
-    if (pwd === correctPassword) {
-      loginScreen.style.display = 'none';
-      adminContent.style.display = 'block';
-      initializeAdmin();
-    } else {
-      loginError.textContent = 'Incorrect password, please try again.';
-    }
-  });
-
-  // VIDEO URLS MANAGEMENT
-  const videoInputsContainer = document.getElementById('video-inputs');
-  const addVideoBtn = document.getElementById('add-video-btn');
-  const saveVideosBtn = document.getElementById('save-videos-btn');
-  const videoSaveStatus = document.getElementById('video-save-status');
-
-  function loadVideoUrls() {
-    const urls = JSON.parse(localStorage.getItem('videoUrls')) || [];
-    videoInputsContainer.innerHTML = '';
-    urls.forEach((url, i) => {
-      const input = document.createElement('input');
-      input.type = 'text';
-      input.value = url;
-      input.placeholder = 'YouTube embed URL';
-      input.dataset.index = i;
-      input.style.width = '100%';
-      input.style.marginTop = '8px';
-      videoInputsContainer.appendChild(input);
-    });
-  }
-
-  addVideoBtn.addEventListener('click', () => {
-    const input = document.createElement('input');
-    input.type = 'text';
-    input.placeholder = 'YouTube embed URL';
-    input.style.width = '100%';
-    input.style.marginTop = '8px';
-    videoInputsContainer.appendChild(input);
-  });
-
-  saveVideosBtn.addEventListener('click', () => {
-    const inputs = videoInputsContainer.querySelectorAll('input[type="text"]');
-    const urls = [];
-    inputs.forEach(input => {
-      if (input.value.trim()) {
-        urls.push(input.value.trim());
-      }
-    });
-    localStorage.setItem('videoUrls', JSON.stringify(urls));
-    videoSaveStatus.textContent = 'Video URLs saved.';
-    setTimeout(() => { videoSaveStatus.textContent = ''; }, 3000);
-  });
-
-  // ABOUT TEXT MANAGEMENT
-  function saveAbout() {
-    const aboutText = document.getElementById('about-text').value;
-    localStorage.setItem('aboutText', aboutText);
-    document.getElementById('about-save-status').textContent = 'About section saved.';
-    setTimeout(() => { document.getElementById('about-save-status').textContent = ''; }, 3000);
-  }
-
-  // SHOWS MANAGEMENT
-  function saveShows() {
-    const showsText = document.getElementById('shows-list').value;
-    localStorage.setItem('showsList', showsText);
-    document.getElementById('shows-save-status').textContent = 'Upcoming shows saved.';
-    setTimeout(() => { document.getElementById('shows-save-status').textContent = ''; }, 3000);
-  }
-
-  // LOGO URL MANAGEMENT
-  function saveLogo() {
-    const url = document.getElementById('logo-url').value;
-    localStorage.setItem('logoURL', url);
-    document.getElementById('logo-save-status').textContent = 'Logo URL saved.';
-    setTimeout(() => { document.getElementById('logo-save-status').textContent = ''; }, 3000);
-  }
-
-  // SOCIALS MANAGEMENT
-  const socialInputsContainer = document.getElementById('social-inputs');
-  const addSocialBtn = document.getElementById('add-social-btn');
-  const saveSocialsBtn = document.getElementById('save-socials-btn');
-  const socialsSaveStatus = document.getElementById('socials-save-status');
-
-  // Platforms for dropdown
-  const socialPlatforms = ['Facebook', 'Instagram', 'Twitter', 'YouTube', 'TikTok'];
-
-  // Create a social input row
-  function createSocialInput({platform = '', url = ''} = {}) {
-    const div = document.createElement('div');
-    div.className = 'social-entry';
-
-    const select = document.createElement('select');
-    socialPlatforms.forEach(p => {
-      const option = document.createElement('option');
-      option.value = p;
-      option.textContent = p;
-      if (p === platform) option.selected = true;
-      select.appendChild(option);
-    });
-
-    const input = document.createElement('input');
-    input.type = 'text';
-    input.placeholder = 'Social media URL';
-    input.value = url;
-
-    const removeBtn = document.createElement('button');
-    removeBtn.textContent = 'Remove';
-    removeBtn.type = 'button';
-    removeBtn.className = 'remove-social-btn';
-    removeBtn.addEventListener('click', () => {
-      socialInputsContainer.removeChild(div);
-    });
-
-    div.appendChild(select);
-    div.appendChild(input);
-    div.appendChild(removeBtn);
-    socialInputsContainer.appendChild(div);
-  }
-
-  addSocialBtn.addEventListener('click', () => {
-    createSocialInput();
-  });
-
-  saveSocialsBtn.addEventListener('click', () => {
-    const socials = [];
-    const entries = socialInputsContainer.querySelectorAll('.social-entry');
-    entries.forEach(entry => {
-      const platform = entry.querySelector('select').value;
-      const url = entry.querySelector('input[type="text"]').value.trim();
-      if (url !== '') {
-        socials.push({ platform, url });
-      }
-    });
-    localStorage.setItem('socials', JSON.stringify(socials));
-    socialsSaveStatus.textContent = 'Social links saved.';
-    setTimeout(() => { socialsSaveStatus.textContent = ''; }, 3000);
-  });
-
-  // BOOKINGS MANAGEMENT
-  // For demo: just load a few sample bookings from localStorage or fallback
-  function loadBookings() {
-    const bookingsJSON = localStorage.getItem('bookings') || '[]';
-    let bookings = [];
-    try {
-      bookings = JSON.parse(bookingsJSON);
-    } catch(e) {
-      bookings = [];
+    function saveLogo() {
+      const url = document.getElementById('logo-url').value;
+      localStorage.setItem('logoURL', url);
+      alert('Logo saved!');
     }
 
-    const tbody = document.getElementById('booking-entries');
-    tbody.innerHTML = '';
-
-    if (bookings.length === 0) {
-      const tr = document.createElement('tr');
-      const td = document.createElement('td');
-      td.colSpan = 5;
-      td.textContent = 'No bookings found.';
-      tr.appendChild(td);
-      tbody.appendChild(tr);
-      return;
+    function saveAbout() {
+      const text = document.getElementById('about-text').value;
+      localStorage.setItem('aboutText', text);
+      alert('About text saved!');
     }
 
-    bookings.forEach(({date, name, email, phone, message}) => {
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td>${date}</td>
-        <td>${name}</td>
-        <td>${email}</td>
-        <td>${phone}</td>
-        <td>${message}</td>
-      `;
-      tbody.appendChild(tr);
-    });
-  }
+    function saveShows() {
+      const text = document.getElementById('shows-list').value;
+      localStorage.setItem('showsList', text);
+      alert('Shows list saved!');
+    }
 
-  // Initialize the admin page inputs with current saved data
-  function initializeAdmin() {
-    // Videos
-    loadVideoUrls();
+    // --- Video Logic ---
+    function loadVideos() {
+      const list = document.getElementById('video-list');
+      list.innerHTML = '';
+      const videos = JSON.parse(localStorage.getItem('videoUrls')) || [];
+      videos.forEach((url, i) => {
+        const div = document.createElement('div');
+        div.className = 'video-item';
+        div.innerHTML = `
+          <input type="text" value="${url}" data-index="${i}" />
+          <button onclick="removeVideo(${i})">Remove</button>
+        `;
+        list.appendChild(div);
+      });
+    }
 
-    // About
-    const aboutText = localStorage.getItem('aboutText') || '';
-    document.getElementById('about-text').value = aboutText;
+    function addVideo() {
+      const videos = JSON.parse(localStorage.getItem('videoUrls')) || [];
+      videos.push('');
+      localStorage.setItem('videoUrls', JSON.stringify(videos));
+      loadVideos();
+    }
 
-    // Shows
-    const showsList = localStorage.getItem('showsList') || '';
-    document.getElementById('shows-list').value = showsList;
+    function removeVideo(index) {
+      const videos = JSON.parse(localStorage.getItem('videoUrls')) || [];
+      videos.splice(index, 1);
+      localStorage.setItem('videoUrls', JSON.stringify(videos));
+      loadVideos();
+    }
 
-    // Logo
-    const logoUrl = localStorage.getItem('logoURL') || '';
-    document.getElementById('logo-url').value = logoUrl;
+    function saveVideos() {
+      const inputs = document.querySelectorAll('.video-item input');
+      const urls = Array.from(inputs).map(input => input.value).filter(v => v.trim() !== '');
+      localStorage.setItem('videoUrls', JSON.stringify(urls));
+      alert('Videos saved!');
+    }
 
-    // Socials
-    const socials = JSON.parse(localStorage.getItem('socials')) || [];
-    socialInputsContainer.innerHTML = '';
-    socials.forEach(social => createSocialInput(social));
+    // --- Socials Logic ---
+    const platforms = ['facebook', 'instagram', 'twitter', 'youtube', 'tiktok'];
 
-    // Bookings
-    loadBookings();
-  }
-</script>
+    function loadSocials() {
+      const list = document.getElementById('social-list');
+      list.innerHTML = '';
+      const socials = JSON.parse(localStorage.getItem('socials')) || [];
+      socials.forEach(({ platform, url }, i) => {
+        const div = document.createElement('div');
+        div.className = 'social-item';
+        div.innerHTML = `
+          <select data-index="${i}">
+            ${platforms.map(p => `<option value="${p}" ${p === platform ? 'selected' : ''}>${p}</option>`).join('')}
+          </select>
+          <input type="text" value="${url}" data-index="${i}" />
+          <button onclick="removeSocial(${i})">Remove</button>
+        `;
+        list.appendChild(div);
+      });
+    }
+
+    function addSocial() {
+      const socials = JSON.parse(localStorage.getItem('socials')) || [];
+      socials.push({ platform: 'facebook', url: '' });
+      localStorage.setItem('socials', JSON.stringify(socials));
+      loadSocials();
+    }
+
+    function removeSocial(index) {
+      const socials = JSON.parse(localStorage.getItem('socials')) || [];
+      socials.splice(index, 1);
+      localStorage.setItem('socials', JSON.stringify(socials));
+      loadSocials();
+    }
+
+    function saveSocials() {
+      const selects = document.querySelectorAll('.social-item select');
+      const inputs = document.querySelectorAll('.social-item input');
+      const socials = Array.from(selects).map((sel, i) => ({
+        platform: sel.value,
+        url: inputs[i].value
+      })).filter(s => s.url.trim() !== '');
+      localStorage.setItem('socials', JSON.stringify(socials));
+      alert('Socials saved!');
+    }
+
+    // Load everything
+    loadVideos();
+    loadSocials();
+  </script>
 
 </body>
 </html>
