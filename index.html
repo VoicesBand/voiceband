@@ -6,6 +6,7 @@
   <title>Voices - STL's Premier Classic Band</title>
   <link rel="stylesheet" href="style.css" />
   <style>
+    /* Ensure iframes in video grid have proper size */
     #video-grid iframe {
       width: 100%;
       max-width: 560px;
@@ -16,100 +17,206 @@
       max-height: 60px;
       max-width: 200px;
     }
+    /* Social media link styling */
+    .social-link {
+      display: flex;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .social-link img {
+      width: 24px;
+      height: 24px;
+      margin-right: 8px;
+    }
+    #socials-section {
+      margin-top: 40px;
+      border: 1px solid #ccc;
+      padding: 16px;
+    }
   </style>
 </head>
 <body>
 
+  <!-- Logo top-left -->
   <div class="logo">
     <img id="logo-img" src="images/logoGTO.jpg" alt="Voices Logo" />
   </div>
 
+  <!-- Navigation bar -->
   <nav class="nav-bar">
     <button onclick="scrollToSection('about')">about</button>
     <button onclick="scrollToSection('shows')">shows</button>
     <button onclick="scrollToSection('gallery')">gallery</button>
     <button onclick="scrollToSection('booking')">booking</button>
+    <button onclick="scrollToSection('socials-section')">socials</button>
     <a href="admin.html" class="admin-link">Admin</a>
   </nav>
 
+  <!-- Band Banner Photo -->
   <header class="hero">
     <img src="images/banner.jpg" alt="Voices Band Banner" />
   </header>
 
+  <!-- About Section -->
   <section id="about">
     <h2>🎤 Voices</h2>
     <p id="about-text">
       Formerly known as GTO (Good Time Oldies), Voices is a seasoned 4-piece band
-      performing around the STL Metro area...
+      performing around the STL Metro area. Blending live instruments and synthetic backing tracks,
+      they cover classic hits from the 60s through the 2000s — full of energy, sound, and nostalgia.
+
+      Left (Pat Downs), middle Left (Billy Presnell), Middle right (Dennis Gillam), Right (Jesse Miller).
     </p>
   </section>
 
+  <!-- Shows Section -->
   <section id="shows">
     <h2>Upcoming Shows</h2>
     <div id="upcoming-shows">Default upcoming shows info here...</div>
   </section>
 
+  <!-- Media Gallery -->
   <section id="gallery">
     <h2>Media Gallery</h2>
-    <div class="video-grid" id="video-grid"></div>
+    <div class="video-grid" id="video-grid">
+      <!-- Videos will be inserted here dynamically -->
+    </div>
     <a href="https://www.youtube.com/@VoicesSTL" target="_blank" class="btn">More Videos</a>
   </section>
 
+  <!-- Booking Section -->
   <section id="booking">
     <h2>Book Voices</h2>
     <iframe 
       src="https://docs.google.com/forms/d/e/1FAIpQLSc8YrV1tr8IuUDKh98gRG5KXC6PyoiE2G7D2zBodrSwv-_w_g/viewform?usp=sharing&ouid=108029081950798897332" 
-      width="100%" height="800" frameborder="0">Loading…</iframe>
+      width="100%" 
+      height="800" 
+      frameborder="0" 
+      marginheight="0" 
+      marginwidth="0">
+      Loading…
+    </iframe>
+  </section>
+
+  <!-- Socials Section (always visible, but empty if no socials) -->
+  <section id="socials-section" class="socials">
+    <h2>Socials</h2>
+    <div id="social-links">
+      <!-- Social links will be populated here -->
+    </div>
   </section>
 
   <script>
-  async function loadContent() {
-    try {
-      const res = await fetch('content.json');
-      if (!res.ok) throw new Error('Failed to load content.json');
-      const data = await res.json();
-
-      // Update About Text
-      const aboutTextElem = document.getElementById('about-text');
-      aboutTextElem.textContent = data.aboutText || '';
-
-      // Update Shows
-      const upcomingShowsElem = document.getElementById('upcoming-shows');
-      upcomingShowsElem.innerHTML = (data.showsList || '').replace(/\n/g, '<br>');
-
-      // Update Logo
-      const logoImg = document.getElementById('logo-img');
-      logoImg.src = data.logoURL || 'images/logoGTO.jpg';
-
-      // Update Videos
-      const videoGrid = document.getElementById('video-grid');
-      videoGrid.innerHTML = '';
-      (data.videoUrls || []).forEach(url => {
-        const iframe = document.createElement('iframe');
-        iframe.src = url;
-        iframe.allowFullscreen = true;
-        iframe.setAttribute('frameborder', '0');
-        videoGrid.appendChild(iframe);
-      });
-    } catch (err) {
-      console.error('Error loading content:', err);
+    // Update logo img src from localStorage or fallback to default
+    const logoImg = document.getElementById('logo-img');
+    const storedLogoUrl = localStorage.getItem('logoURL');
+    if (storedLogoUrl && storedLogoUrl.trim() !== '') {
+      logoImg.src = storedLogoUrl;
     }
-  }
 
-  loadContent();
+    // Update About section text from localStorage
+    const aboutTextElem = document.getElementById('about-text');
+    const storedAbout = localStorage.getItem('aboutText');
+    if (storedAbout && storedAbout.trim() !== '') {
+      aboutTextElem.textContent = storedAbout;
+    }
 
-  function scrollToSection(sectionId) {
-    const section = document.getElementById(sectionId.toLowerCase());
-    if (section) section.scrollIntoView({ behavior: 'smooth' });
-  }
-</script>
+    // Update Upcoming Shows from localStorage with line breaks
+    const upcomingShowsElem = document.getElementById('upcoming-shows');
+    const storedShows = localStorage.getItem('showsList');
+    if (storedShows && storedShows.trim() !== '') {
+      upcomingShowsElem.innerHTML = storedShows.replace(/\n/g, '<br>');
+    }
 
-    const channel = new BroadcastChannel('site-updates');
-    channel.onmessage = (event) => {
-      if (event.data === 'refresh') {
-        location.reload();
-      }
+    // Load videos from localStorage or use default videos
+    const defaultVideos = [
+      "https://www.youtube.com/embed/ycCKV5uYKSE",
+      "https://www.youtube.com/embed/O-PhaZvzlYw"
+    ];
+    const videoUrls = JSON.parse(localStorage.getItem('videoUrls')) || defaultVideos;
+
+    const videoGrid = document.getElementById('video-grid');
+    videoGrid.innerHTML = '';
+
+    videoUrls.forEach(url => {
+      const iframe = document.createElement('iframe');
+      iframe.src = url;
+      iframe.allowFullscreen = true;
+      iframe.setAttribute('frameborder', '0');
+      videoGrid.appendChild(iframe);
+    });
+
+    // Social media icons for platforms
+    const socialIcons = {
+      facebook: "https://cdn-icons-png.flaticon.com/512/124/124010.png",
+      instagram: "https://cdn-icons-png.flaticon.com/512/2111/2111463.png",
+      twitter: "https://cdn-icons-png.flaticon.com/512/124/124021.png",
+      youtube: "https://cdn-icons-png.flaticon.com/512/1384/1384060.png",
+      tiktok: "https://cdn-icons-png.flaticon.com/512/3046/3046120.png"
     };
+
+    // Load socials from localStorage
+    const socials = JSON.parse(localStorage.getItem('socials')) || [];
+    const socialLinksContainer = document.getElementById('social-links');
+
+    socialLinksContainer.innerHTML = '';
+    if (socials.length === 0) {
+      socialLinksContainer.textContent = 'No social links available.';
+    } else {
+      socials.forEach(({ platform, url }) => {
+        if (platform && url) {
+          const div = document.createElement('div');
+          div.className = 'social-link';
+
+          const img = document.createElement('img');
+          img.src = socialIcons[platform.toLowerCase()] || '';
+          img.alt = platform + " logo";
+
+          const link = document.createElement('a');
+          link.href = url;
+          link.target = "_blank";
+          link.textContent = url;
+
+          div.appendChild(img);
+          div.appendChild(link);
+          socialLinksContainer.appendChild(div);
+        }
+      });
+    }
+
+    // Smooth scroll to sections
+    function scrollToSection(sectionId) {
+      const section = document.getElementById(sectionId.toLowerCase());
+      if (section) {
+        section.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+
+    // Auto reload logic for tabs with similar URLs (about, shows, gallery, socials)
+    const urlBase = window.location.origin + window.location.pathname;
+
+    function reloadIfUrlMatches() {
+      const openTabs = [...window.openedTabs || []];
+      openTabs.forEach(tab => {
+        try {
+          const tabUrl = tab.location.href;
+          if (tabUrl.startsWith(urlBase)) {
+            tab.location.reload();
+          }
+        } catch (e) {
+          // cross origin or closed tab error, ignore
+        }
+      });
+    }
+
+    // Hook this to your admin save action to trigger reload on other tabs
+    // For demonstration, we'll just listen for storage event (can be removed if handled elsewhere)
+    window.addEventListener('storage', (e) => {
+      if (e.key === 'socials' || e.key === 'videoUrls' || e.key === 'showsList' || e.key === 'aboutText') {
+        reloadIfUrlMatches();
+      }
+    });
+
   </script>
 
 </body>
