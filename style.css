@@ -160,6 +160,50 @@ form button:hover {
   background: #009acd;
 }
 
+@media (max-width: 600px) {
+  .site-header {
+    flex-wrap: nowrap;
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .logo {
+    margin-right: 10px;
+  }
+
+  .nav-container {
+    overflow-x: auto;
+    flex: 1;
+  }
+
+  .nav-bar {
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    gap: 6px;
+  }
+
+  .nav-bar button,
+  .nav-bar a {
+    font-size: 13px;
+    padding: 6px 10px;
+    white-space: nowrap;
+  }
+
+  #carousel img {
+    border-radius: 4px;
+  }
+
+  iframe {
+    height: auto;
+    aspect-ratio: 16/9;
+  }
+
+  .video-grid iframe {
+    max-width: 100%;
+    height: auto;
+  }
+}
+
 footer {
   padding: 2rem;
   background-color: #222;
