@@ -13,32 +13,34 @@ body {
 .site-header {
   position: sticky;
   top: 0;
-  background-color: #000;
   z-index: 1000;
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 10px 16px;
+  background-color: #000;
   border-bottom: 1px solid #000;
   flex-wrap: nowrap;
 }
 
 .logo img {
-  width: 70px;
+  width: 55px; /* smaller logo for mobile */
   height: auto;
 }
 
-.nav-bar-wrapper {
-  flex: 1;
+/* Enables horizontal scroll if nav overflows */
+.nav-scroll {
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  flex: 1;
 }
 
 .nav-bar {
   display: flex;
   gap: 8px;
-  justify-content: center;
-  flex-wrap: nowrap;
   white-space: nowrap;
+  justify-content: flex-start;
+  padding: 4px 0;
 }
 
 .nav-bar button,
@@ -47,14 +49,20 @@ body {
   color: white;
   border: none;
   padding: 8px 12px;
-  font-size: 15px;
+  font-size: 14px;
   text-decoration: none;
   border-radius: 4px;
   cursor: pointer;
+  white-space: nowrap;
 }
 
 .nav-bar a.admin-link {
   background-color: #666;
+}
+
+/* Optional: hide scrollbar on some devices */
+.nav-scroll::-webkit-scrollbar {
+  display: none;
 }
 
 .hero {
