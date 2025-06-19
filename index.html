@@ -37,7 +37,6 @@
       document.getElementById('logo-img').src = staticData.logoURL;
       document.getElementById('about-text').textContent = staticData.aboutText;
       document.getElementById('upcoming-shows').innerHTML = staticData.showsList.replace(/\n/g, '<br>');
-
       const videoGrid = document.getElementById('video-grid');
       videoGrid.innerHTML = '';
       staticData.videoUrls.forEach(url => {
@@ -47,7 +46,6 @@
         iframe.setAttribute('frameborder', '0');
         videoGrid.appendChild(iframe);
       });
-
       const socials = document.getElementById('social-links');
       socials.innerHTML = '';
       staticData.socials.forEach(({ platform, url }) => {
@@ -74,7 +72,6 @@
       'images/5.JPG'
     ];
     let currentImgIndex = 0;
-
     function cycleCarousel() {
       const img = document.getElementById('carousel-img');
       currentImgIndex = (currentImgIndex + 1) % carouselImages.length;
@@ -114,8 +111,8 @@
     <p id="about-text"></p>
   </section>
 
-  <div id="carousel" style="text-align: center; margin: 40px auto;">
-    <img id="carousel-img" src="images/1.JPG" alt="Band Carousel" style="width: 100%; max-width: 800px; height: auto; border-radius: 8px;" />
+  <div id="carousel">
+    <img id="carousel-img" src="images/1.JPG" alt="Band Carousel" />
   </div>
 
   <section id="shows">
