@@ -37,7 +37,7 @@ body {
   display: flex;
   gap: 8px;
   white-space: nowrap;
-  justify-content: center;  /* ✨ Center nav buttons on desktop */
+  justify-content: center; /* ✅ center by default (desktop) */
   padding: 4px 0;
 }
 .nav-bar button,
@@ -172,7 +172,7 @@ footer {
 
 @media (max-width: 768px) {
   .nav-bar {
-    justify-content: flex-start;  /* 👈 Left-align on mobile */
+    justify-content: flex-start;
   }
 }
 
