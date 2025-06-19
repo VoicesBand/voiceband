@@ -6,7 +6,6 @@
   <title>Voices - STL's Premier Classic Band</title>
   <link rel="stylesheet" href="style.css" />
   <style>
-    /* Ensure iframes in video grid have proper size */
     #video-grid iframe {
       width: 100%;
       max-width: 560px;
@@ -17,7 +16,6 @@
       max-height: 60px;
       max-width: 200px;
     }
-    /* Social media link styling */
     .social-link {
       display: flex;
       align-items: center;
@@ -35,7 +33,6 @@
     }
   </style>
   <script>
-    // Static hardcoded data — no database calls
     const staticData = {
       logoURL: "images/logoGTO.jpg",
       aboutText: `Formerly known as GTO (Good Time Oldies), Voices is a seasoned 4-piece band
@@ -51,11 +48,10 @@
       socials: [
         { platform: "Facebook", url: "https://facebook.com/VoicesSTL" },
         { platform: "YouTube", url: "https://youtube.com/@VoicesSTL" },
-        { platform: "TikTok" , url: "https://www.tiktok.com/@voicesbandofficial"}
+        { platform: "TikTok", url: "https://www.tiktok.com/@voicesbandofficial" }
       ]
     };
 
-    // Social media icons map
     const socialIcons = {
       facebook: "https://cdn-icons-png.flaticon.com/512/124/124010.png",
       instagram: "https://cdn-icons-png.flaticon.com/512/2111/2111463.png",
@@ -64,21 +60,17 @@
       tiktok: "https://cdn-icons-png.flaticon.com/512/3046/3046120.png"
     };
 
-    // Update the DOM with static data
     function updatePage() {
-      // Logo
       const logoImg = document.getElementById('logo-img');
       if (staticData.logoURL && staticData.logoURL.trim() !== '') {
         logoImg.src = staticData.logoURL;
       }
 
-      // About Text
       const aboutTextElem = document.getElementById('about-text');
       if (staticData.aboutText && staticData.aboutText.trim() !== '') {
         aboutTextElem.textContent = staticData.aboutText;
       }
 
-      // Upcoming Shows
       const upcomingShowsElem = document.getElementById('upcoming-shows');
       if (staticData.showsList && staticData.showsList.trim() !== '') {
         upcomingShowsElem.innerHTML = staticData.showsList.replace(/\n/g, '<br>');
@@ -86,7 +78,6 @@
         upcomingShowsElem.textContent = 'No upcoming shows currently.';
       }
 
-      // Videos
       const videoGrid = document.getElementById('video-grid');
       videoGrid.innerHTML = '';
       staticData.videoUrls.forEach(url => {
@@ -97,7 +88,6 @@
         videoGrid.appendChild(iframe);
       });
 
-      // Socials
       const socialLinksContainer = document.getElementById('social-links');
       socialLinksContainer.innerHTML = '';
       if (!staticData.socials || staticData.socials.length === 0) {
@@ -125,7 +115,6 @@
       }
     }
 
-    // Smooth scroll helper
     function scrollToSection(sectionId) {
       const section = document.getElementById(sectionId.toLowerCase());
       if (section) {
@@ -133,17 +122,36 @@
       }
     }
 
-    window.onload = updatePage;
+    // Image Carousel Setup
+    const carouselImages = [
+      'images/1.jpg',
+      'images/2.jpg',
+      'images/3.jpg',
+      'images/4.jpg',
+      'images/5.jpg'
+    ];
+    let currentImgIndex = 0;
+
+    function cycleCarousel() {
+      const carousel = document.getElementById('carousel-img');
+      if (carousel) {
+        currentImgIndex = (currentImgIndex + 1) % carouselImages.length;
+        carousel.src = carouselImages[currentImgIndex];
+      }
+    }
+
+    window.onload = () => {
+      updatePage();
+      setInterval(cycleCarousel, 4000);
+    };
   </script>
 </head>
 <body>
 
-  <!-- Logo top-left -->
   <div class="logo">
     <img id="logo-img" src="images/logoGTO.jpg" alt="Voices Logo" />
   </div>
 
-  <!-- Navigation bar -->
   <nav class="nav-bar">
     <button onclick="scrollToSection('about')">about</button>
     <button onclick="scrollToSection('shows')">shows</button>
@@ -153,12 +161,10 @@
     <a href="admin.html" class="admin-link">Admin</a>
   </nav>
 
-  <!-- Band Banner Photo -->
   <header class="hero">
     <img src="images/banner.jpg" alt="Voices Band Banner" />
   </header>
 
-  <!-- About Section -->
   <section id="about">
     <h2>🎤 Voices</h2>
     <p id="about-text">
@@ -166,22 +172,24 @@
     </p>
   </section>
 
-  <!-- Shows Section -->
+  <!-- 🚀 Inserted Image Carousel -->
+  <div id="carousel" style="max-width: 100%; margin: 40px auto; text-align: center;">
+    <img id="carousel-img" src="images/carousel1.jpg" alt="Band Carousel" style="width: 100%; max-width: 800px; height: auto; border-radius: 8px;" />
+  </div>
+
   <section id="shows">
     <h2>Upcoming Shows</h2>
     <div id="upcoming-shows">Default upcoming shows info here...</div>
   </section>
 
-  <!-- Media Gallery -->
   <section id="gallery">
     <h2>Media Gallery</h2>
     <div class="video-grid" id="video-grid">
-      <!-- Videos will be inserted here dynamically -->
+      <!-- Videos injected by JS -->
     </div>
     <a href="https://www.youtube.com/@VoicesSTL" target="_blank" class="btn">More Videos</a>
   </section>
 
-  <!-- Booking Section -->
   <section id="booking">
     <h2>Book Voices</h2>
     <iframe 
@@ -195,11 +203,10 @@
     </iframe>
   </section>
 
-  <!-- Socials Section (always visible, but empty if no socials) -->
   <section id="socials-section" class="socials">
     <h2>Socials</h2>
     <div id="social-links">
-      <!-- Social links will be populated here -->
+      <!-- Social links populated by JS -->
     </div>
   </section>
 
