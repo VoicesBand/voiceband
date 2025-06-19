@@ -37,7 +37,7 @@ body {
   display: flex;
   gap: 8px;
   white-space: nowrap;
-  justify-content: center;
+  justify-content: center;  /* ✨ Center nav buttons on desktop */
   padding: 4px 0;
 }
 .nav-bar button,
@@ -170,11 +170,11 @@ footer {
   text-align: center;
 }
 
-/* Mobile adjustments */
 @media (max-width: 768px) {
   .nav-bar {
-    justify-content: flex-start;
+    justify-content: flex-start;  /* 👈 Left-align on mobile */
   }
+}
 
   .nav-bar button,
   .nav-bar a {
@@ -195,4 +195,3 @@ footer {
     height: auto;
     aspect-ratio: 16/9;
   }
-}
