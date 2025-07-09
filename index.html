@@ -83,6 +83,33 @@
     window.onload = () => {
       updatePage();
       setInterval(cycleCarousel, 4000);
+
+      const form = document.getElementById("booking-form");
+      const scriptURL = "https://script.google.com/macros/s/AKfycbwY-yrMd6ty4qH3_AYdRQXsEJtL54IR4Bz02eEKRFsn4e57bdqvBq-aCDq1F8j3AjUJZQ/exec";
+
+      form.addEventListener("submit", (e) => {
+        e.preventDefault();
+
+        const formData = new FormData(form);
+
+        fetch(scriptURL, {
+          method: "POST",
+          body: new URLSearchParams(formData),
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (data.result === "success") {
+            alert("✅ Booking submitted successfully!");
+            form.reset();
+          } else {
+            alert("❌ Error: " + data.message);
+          }
+        })
+        .catch(error => {
+          console.error("Error sending booking:", error);
+          alert("❌ Network or system error occurred.");
+        });
+      });
     };
   </script>
 </head>
@@ -130,9 +157,14 @@
 
   <section id="booking">
     <h2>Book Voices</h2>
-    <iframe 
-      src="https://docs.google.com/forms/d/e/1FAIpQLSc8YrV1tr8IuUDKh98gRG5KXC6PyoiE2G7D2zBodrSwv-_w_g/viewform?usp=sharing"
-      width="100%" height="800" frameborder="0">Loading…</iframe>
+    <form id="booking-form">
+      <input type="text" name="name" placeholder="Your Name" required />
+      <input type="email" name="email" placeholder="Your Email" required />
+      <input type="text" name="date" placeholder="Requested Date" />
+      <input type="text" name="location" placeholder="Event Location" />
+      <textarea name="message" placeholder="Additional Info or Questions"></textarea>
+      <button type="submit">Submit Booking</button>
+    </form>
   </section>
 
   <section id="socials-section" class="socials">
