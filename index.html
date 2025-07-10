@@ -85,11 +85,10 @@
       setInterval(cycleCarousel, 4000);
 
       const form = document.getElementById("booking-form");
-      const scriptURL = "https://script.google.com/macros/s/AKfycbwY-yrMd6ty4qH3_AYdRQXsEJtL54IR4Bz02eEKRFsn4e57bdqvBq-aCDq1F8j3AjUJZQ/exec";
+      const scriptURL = "https://script.google.com/macros/s/AKfycbyBw8Fj14H60Y6hIyhvP0DDyiDVxZu-KFHRcA_zeBlIIWHX-IvkSEP4m9r4NzQsiGketA/exec";
 
       form.addEventListener("submit", (e) => {
         e.preventDefault();
-
         const formData = new FormData(form);
 
         fetch(scriptURL, {
@@ -108,6 +107,29 @@
         .catch(error => {
           console.error("Error sending booking:", error);
           alert("❌ Network or system error occurred.");
+        });
+      });
+
+      const newsletterBtn = document.getElementById("newsletter-btn");
+      newsletterBtn.addEventListener("click", () => {
+        const email = prompt("Enter your email to sign up for the newsletter:");
+        if (!email || !email.includes("@")) return alert("Invalid email.");
+
+        fetch("https://script.google.com/macros/s/AKfycbyBw8Fj14H60Y6hIyhvP0DDyiDVxZu-KFHRcA_zeBlIIWHX-IvkSEP4m9r4NzQsiGketA/exec", {
+          method: "POST",
+          body: new URLSearchParams({ email, newsletter: "true" })
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (data.result === "success") {
+            alert("✅ Thanks for signing up! A confirmation email has been sent.");
+          } else {
+            alert("❌ Error: " + data.message);
+          }
+        })
+        .catch(err => {
+          console.error(err);
+          alert("❌ Failed to sign up.");
         });
       });
     };
@@ -165,6 +187,11 @@
       <textarea name="message" placeholder="Additional Info or Questions"></textarea>
       <button type="submit">Submit Booking</button>
     </form>
+  </section>
+
+  <section id="newsletter">
+    <h2>📧 Newsletter</h2>
+    <button id="newsletter-btn">Sign Up for Updates</button>
   </section>
 
   <section id="socials-section" class="socials">

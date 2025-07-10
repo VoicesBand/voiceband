@@ -37,7 +37,7 @@ body {
   display: flex;
   gap: 8px;
   white-space: nowrap;
-  justify-content: center; /* ✅ center by default (desktop) */
+  justify-content: center;
   padding: 4px 0;
 }
 .nav-bar button,
@@ -126,6 +126,7 @@ h2 {
   padding: 16px;
 }
 
+/* Buttons */
 .btn {
   background: #00bfff;
   color: #000;
@@ -139,7 +140,7 @@ h2 {
   background: #009acd;
 }
 
-/* Forms (if applicable) */
+/* Forms (Booking + Newsletter) */
 form input,
 form textarea {
   display: block;
@@ -147,7 +148,13 @@ form textarea {
   margin: 0.5rem 0;
   padding: 0.75rem;
   border-radius: 5px;
-  border: none;
+  border: 1px solid #444;
+  background-color: #111;
+  color: #fff;
+}
+form input::placeholder,
+form textarea::placeholder {
+  color: #ccc;
 }
 
 form button {
@@ -162,6 +169,21 @@ form button:hover {
   background: #009acd;
 }
 
+/* Newsletter Sign-Up Button */
+#newsletter-btn {
+  background-color: #111;
+  color: #fff;
+  padding: 10px 20px;
+  font-size: 16px;
+  border: 1px solid #444;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+#newsletter-btn:hover {
+  background-color: #222;
+}
+
 /* Footer (optional) */
 footer {
   padding: 2rem;
@@ -170,28 +192,25 @@ footer {
   text-align: center;
 }
 
+/* Responsive */
 @media (max-width: 768px) {
   .nav-bar {
     justify-content: flex-start;
   }
-}
-
   .nav-bar button,
   .nav-bar a {
     font-size: 13px;
     padding: 6px 10px;
   }
-
   #carousel img {
     border-radius: 4px;
   }
-
   .video-grid iframe {
     max-width: 100%;
     height: auto;
   }
-
   iframe {
     height: auto;
     aspect-ratio: 16/9;
   }
+}

@@ -1,4 +1,4 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -43,8 +43,6 @@
     th { background-color: #f4f4f4; }
     #bookings-container { margin-top: 20px; }
     #admin-content { display: none; }
-
-    /* Socials admin display styling */
     .social-entry {
       display: flex;
       gap: 10px;
@@ -53,6 +51,28 @@
     }
     .social-entry select, .social-entry input[type="text"] {
       flex: 1;
+    }
+    .newsletter-broadcast {
+      margin-top: 20px;
+      border: 1px solid #ccc;
+      padding: 15px;
+      background: #f9f9f9;
+    }
+    .newsletter-broadcast label {
+      margin-top: 10px;
+      font-weight: bold;
+    }
+    .newsletter-broadcast input[type="text"],
+    .newsletter-broadcast textarea {
+      margin-bottom: 10px;
+    }
+    .newsletter-broadcast button {
+      background-color: green;
+      color: white;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
     }
   </style>
 </head>
@@ -101,6 +121,25 @@ September 10 – Local Fest
       </textarea>
     </div>
 
+    <!-- Newsletter Broadcast -->
+    <div class="newsletter-broadcast">
+      <h2>📣 Send Upcoming Show Email</h2>
+      <label for="show-date">Show Date:</label>
+      <input type="text" id="show-date" placeholder="e.g., July 28 – STL Expo" />
+
+      <label for="show-time">Show Time:</label>
+      <input type="text" id="show-time" placeholder="e.g., 7:30 PM" />
+
+      <label for="show-location">Show Location (address or venue):</label>
+      <input type="text" id="show-location" placeholder="e.g., 123 Main St, STL, MO" />
+
+      <label for="show-info">Additional Info:</label>
+      <textarea id="show-info" rows="4" placeholder="Details for the upcoming show..."></textarea>
+
+      <button onclick="sendNewsletter()">Send to Newsletter Subscribers</button>
+      <p id="newsletter-status"></p>
+    </div>
+
     <!-- Logo URL Display -->
     <div id="logo-editor">
       <h2>🖼️ Logo URL (Top Left)</h2>
@@ -143,7 +182,7 @@ September 10 – Local Fest
   </div>
 
 <script>
-  const correctPassword = 'test123'; // Replace with your password
+  const correctPassword = 'test123';
 
   const loginScreen = document.getElementById('login-screen');
   const adminContent = document.getElementById('admin-content');
@@ -159,6 +198,45 @@ September 10 – Local Fest
       loginError.textContent = 'Incorrect password, please try again.';
     }
   });
+
+  function sendNewsletter() {
+    const date = document.getElementById('show-date').value.trim();
+    const time = document.getElementById('show-time').value.trim();
+    const location = document.getElementById('show-location').value.trim();
+    const info = document.getElementById('show-info').value.trim();
+    const status = document.getElementById('newsletter-status');
+
+    if (!date || !info || !location || !time) {
+      alert("Please fill out Date, Time, Location, and Additional Info.");
+      return;
+    }
+
+    fetch("https://script.google.com/macros/s/AKfycbyBw8Fj14H60Y6hIyhvP0DDyiDVxZu-KFHRcA_zeBlIIWHX-IvkSEP4m9r4NzQsiGketA/exec", {
+      method: "POST",
+      body: new URLSearchParams({
+        broadcast: "true",
+        date,
+        time,
+        location,
+        info
+      })
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.result === "success") {
+        status.textContent = `✅ Email sent successfully to all newsletter subscribers (${data.sent} emails).`;
+        status.style.color = "green";
+      } else {
+        status.textContent = "❌ Error sending email: " + data.message;
+        status.style.color = "red";
+      }
+    })
+    .catch(err => {
+      status.textContent = "❌ Failed to send email.";
+      status.style.color = "red";
+      console.error(err);
+    });
+  }
 </script>
 
 </body>
