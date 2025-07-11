@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Voices Admin</title>
   <style>
-    body { font-family: Arial, sans-serif; padding: 20px; }
+    body { font-family: Arial, sans-serif; padding: 20px; background-color: #111; color: white; }
     #home-btn {
       position: static;
       top: 6px;
@@ -18,61 +18,59 @@
       border-radius: 4px;
       cursor: pointer;
       z-index: 4000;
+      margin-bottom: 20px;
     }
-    label { display: block; margin-top: 15px; }
-    input[type="text"], textarea, select {
+    label, input, textarea, select, button {
+      display: block;
       width: 100%;
+      margin-top: 10px;
+    }
+    input, textarea, select {
+      background-color: #111;
+      color: white;
+      border: 1px solid #444;
       padding: 8px;
-      font-size: 14px;
-      margin-top: 5px;
+      border-radius: 4px;
       box-sizing: border-box;
-      background: #f4f4f4;
-      border: 1px solid #ccc;
-      color: #555;
+      font-size: 14px;
     }
     input[readonly], textarea[readonly], select[disabled] {
-      background: #eee;
-      color: #333;
+      background: #222;
+      color: #ccc;
       cursor: default;
     }
-    h2 {
-      margin-top: 40px;
+    button {
+      margin-top: 15px;
+      background-color: #00bfff;
+      border: none;
+      padding: 10px;
+      color: black;
+      font-weight: bold;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    button:hover {
+      background-color: #009acd;
+    }
+    h1, h2 {
+      margin-top: 30px;
+      color: #00bfff;
     }
     table { border-collapse: collapse; width: 100%; margin-top: 20px; }
-    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
-    th { background-color: #f4f4f4; }
-    #bookings-container { margin-top: 20px; }
-    #admin-content { display: none; }
-    .social-entry {
-      display: flex;
-      gap: 10px;
-      align-items: center;
+    th, td { border: 1px solid #444; padding: 8px; text-align: left; }
+    th { background-color: #222; }
+    #login-screen {
+      max-width: 400px;
+      margin: 50px auto;
+      background: #222;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px #000;
+    }
+    #login-error {
+      color: #ff4444;
       margin-top: 10px;
-    }
-    .social-entry select, .social-entry input[type="text"] {
-      flex: 1;
-    }
-    .newsletter-broadcast {
-      margin-top: 20px;
-      border: 1px solid #ccc;
-      padding: 15px;
-      background: #f9f9f9;
-    }
-    .newsletter-broadcast label {
-      margin-top: 10px;
-      font-weight: bold;
-    }
-    .newsletter-broadcast input[type="text"],
-    .newsletter-broadcast textarea {
-      margin-bottom: 10px;
-    }
-    .newsletter-broadcast button {
-      background-color: green;
-      color: white;
-      padding: 10px 15px;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
     }
   </style>
 </head>
@@ -84,11 +82,11 @@
     <label for="password">Enter password:</label>
     <input type="password" id="password" autocomplete="off" />
     <button id="login-btn">Login</button>
-    <p id="login-error" style="color:red;"></p>
+    <p id="login-error"></p>
   </div>
 
   <!-- Admin dashboard content -->
-  <div id="admin-content">
+  <div id="admin-content" style="display:none;">
 
     <button id="home-btn" onclick="location.href='index.html'">Home</button>
 
@@ -124,19 +122,21 @@ September 10 – Local Fest
     <!-- Newsletter Broadcast -->
     <div class="newsletter-broadcast">
       <h2>📣 Send Upcoming Show Email</h2>
-      <label for="show-date">Show Date:</label>
-      <input type="text" id="show-date" placeholder="e.g., July 28 – STL Expo" />
 
-      <label for="show-time">Show Time:</label>
-      <input type="text" id="show-time" placeholder="e.g., 7:30 PM" />
+      <label for="show-date">Show Date (e.g., July 28, 2025):</label>
+      <input type="text" id="show-date" placeholder="July 28, 2025" />
 
-      <label for="show-location">Show Location (address or venue):</label>
-      <input type="text" id="show-location" placeholder="e.g., 123 Main St, STL, MO" />
+      <label for="show-time">Show Time (e.g., 4:00 PM):</label>
+      <input type="text" id="show-time" placeholder="4:00 PM" />
+
+      <label for="show-location">Location:</label>
+      <input type="text" id="show-location" placeholder="240 E Main St, Festus, MO 63028" />
 
       <label for="show-info">Additional Info:</label>
       <textarea id="show-info" rows="4" placeholder="Details for the upcoming show..."></textarea>
 
       <button onclick="sendNewsletter()">Send to Newsletter Subscribers</button>
+
       <p id="newsletter-status"></p>
     </div>
 
@@ -174,7 +174,7 @@ September 10 – Local Fest
     <!-- Booking Sheet Link -->
     <div class="section" id="bookings-container">
       <h2>📄 Booking Spreadsheet</h2>
-      <a href="https://docs.google.com/spreadsheets/d/1Fucpvl0eNb2WfAirA2suqLIQLYjjJ5v68W7Z4WD95_E/edit#gid=807357404" target="_blank">
+      <a href="https://docs.google.com/spreadsheets/d/1Fucpvl0eNb2WfAirA2suqLIQLYjjJ5v68W7Z4WD95_E/edit#gid=807357404" target="_blank" style="color:#00bfff;">
         Open Booking Google Sheet
       </a>
     </div>
@@ -206,26 +206,26 @@ September 10 – Local Fest
     const info = document.getElementById('show-info').value.trim();
     const status = document.getElementById('newsletter-status');
 
-    if (!date || !info || !location || !time) {
-      alert("Please fill out Date, Time, Location, and Additional Info.");
+    if (!date || !time || !location) {
+      alert("Please fill out date, time, and location.");
       return;
     }
 
-    fetch("https://script.google.com/macros/s/AKfycbyBw8Fj14H60Y6hIyhvP0DDyiDVxZu-KFHRcA_zeBlIIWHX-IvkSEP4m9r4NzQsiGketA/exec", {
+    fetch("https://script.google.com/macros/s/AKfycby8uzyf8wH0ZteEoboa7p2a8xr7nwKD1ox2rCLEuJSNs_ODD-zvmolOL7z4CV2F3ap5uQ/exec", {
       method: "POST",
       body: new URLSearchParams({
         broadcast: "true",
-        date,
-        time,
-        location,
-        info
+        date: date,
+        time: time,
+        location: location,
+        info: info
       })
     })
     .then(res => res.json())
     .then(data => {
       if (data.result === "success") {
-        status.textContent = `✅ Email sent successfully to all newsletter subscribers (${data.sent} emails).`;
-        status.style.color = "green";
+        status.textContent = `✅ Email sent successfully to ${data.sent} newsletter subscribers.`;
+        status.style.color = "lightgreen";
       } else {
         status.textContent = "❌ Error sending email: " + data.message;
         status.style.color = "red";

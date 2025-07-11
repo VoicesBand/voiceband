@@ -85,7 +85,7 @@
       setInterval(cycleCarousel, 4000);
 
       const form = document.getElementById("booking-form");
-      const scriptURL = "https://script.google.com/macros/s/AKfycbyBw8Fj14H60Y6hIyhvP0DDyiDVxZu-KFHRcA_zeBlIIWHX-IvkSEP4m9r4NzQsiGketA/exec";
+      const scriptURL = "https://script.google.com/macros/s/AKfycby8uzyf8wH0ZteEoboa7p2a8xr7nwKD1ox2rCLEuJSNs_ODD-zvmolOL7z4CV2F3ap5uQ/exec";
 
       form.addEventListener("submit", (e) => {
         e.preventDefault();
@@ -115,7 +115,7 @@
         const email = prompt("Enter your email to sign up for the newsletter:");
         if (!email || !email.includes("@")) return alert("Invalid email.");
 
-        fetch("https://script.google.com/macros/s/AKfycbyBw8Fj14H60Y6hIyhvP0DDyiDVxZu-KFHRcA_zeBlIIWHX-IvkSEP4m9r4NzQsiGketA/exec", {
+        fetch("https://script.google.com/macros/s/AKfycby8uzyf8wH0ZteEoboa7p2a8xr7nwKD1ox2rCLEuJSNs_ODD-zvmolOL7z4CV2F3ap5uQ/exec", {
           method: "POST",
           body: new URLSearchParams({ email, newsletter: "true" })
         })
