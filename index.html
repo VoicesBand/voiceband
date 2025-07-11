@@ -14,7 +14,7 @@
       they cover classic hits from the 60s through the 2000s — full of energy, sound, and nostalgia.
 
       Left (Pat Downs), middle Left (Billy Presnell), Middle right (Dennis Gillam), Right (Jesse Miller).`,
-      showsList: `KC HALL DeSoto, MO DEC. 31st`,
+      showsList: ``,
       videoUrls: [
         "https://www.youtube.com/embed/ycCKV5uYKSE",
         "https://www.youtube.com/embed/O-PhaZvzlYw",
@@ -36,15 +36,12 @@
       tiktok: "https://cdn-icons-png.flaticon.com/512/3046/3046120.png"
     };
 
-    // Format date like: "AUG. 10th"
     function formatDateString(dateStr) {
       if (!dateStr) return '';
       const dateObj = new Date(dateStr);
       if (isNaN(dateObj.getTime())) return '';
-
       const monthNames = ["JAN.", "FEB.", "MAR.", "APR.", "MAY", "JUN.", "JUL.", "AUG.", "SEP.", "OCT.", "NOV.", "DEC."];
       const day = dateObj.getDate();
-
       function ordinalSuffix(n) {
         if (n > 3 && n < 21) return n + "th";
         switch (n % 10) {
@@ -54,14 +51,11 @@
           default: return n + "th";
         }
       }
-
       return `${monthNames[dateObj.getMonth()]} ${ordinalSuffix(day)}`;
     }
 
-    // Format time like "8AM", "10:30PM", or "Time TBD"
     function formatTimeForDisplay(timeValue) {
       if (!timeValue) return "Time TBD";
-
       if (typeof timeValue === 'string') {
         const parsedDate = new Date(timeValue);
         if (!isNaN(parsedDate.getTime())) {
@@ -71,27 +65,21 @@
           return trimmed.length > 0 ? trimmed : "Time TBD";
         }
       }
-
       if (timeValue instanceof Date && !isNaN(timeValue.getTime())) {
         let hours = timeValue.getHours();
         let minutes = timeValue.getMinutes();
         let ampm = hours >= 12 ? "PM" : "AM";
-
         hours = hours % 12;
         if (hours === 0) hours = 12;
-
         let minutesStr = minutes === 0 ? "" : ":" + (minutes < 10 ? "0" + minutes : minutes);
-
         return `${hours}${minutesStr}${ampm}`;
       }
-
       return "Time TBD";
     }
 
     function updatePage() {
       document.getElementById('logo-img').src = staticData.logoURL;
       document.getElementById('about-text').textContent = staticData.aboutText;
-      document.getElementById('upcoming-shows').innerHTML = staticData.showsList.replace(/\n/g, '<br>');
       const videoGrid = document.getElementById('video-grid');
       videoGrid.innerHTML = '';
       staticData.videoUrls.forEach(url => {
@@ -133,36 +121,29 @@
       img.src = carouselImages[currentImgIndex];
     }
 
-    // === NEW: Dynamic Upcoming Shows Section ===
     const webAppURL = "https://script.google.com/macros/s/AKfycbzmbxFFBwcv9leZmzK9MHlKSlizPqNRkiu1dtMayvfR6V01ueiwlvBvSHvf-k9BY6p_2A/exec";
-
     function loadDynamicShows() {
       fetch(webAppURL)
         .then(res => res.json())
         .then(data => {
+          const output = document.getElementById('dynamic-shows-output');
           if (data.error) {
-            document.getElementById('dynamic-shows-output').textContent = "Error: " + data.error;
+            output.textContent = "Error: " + data.error;
             return;
           }
           if (!data.length) {
-            document.getElementById('dynamic-shows-output').textContent = "No shows found.";
+            output.textContent = "No shows found.";
             return;
           }
-
           let html = '';
           data.forEach(show => {
             const location = show.Location || 'Unknown Location';
             const dateFormatted = formatDateString(show.Date);
             const timeFormatted = formatTimeForDisplay(show.Time);
-
             if (!location || !dateFormatted) return;
-
-            html += `<div class="show-entry">
-              ${location} ${dateFormatted} at ${timeFormatted}
-            </div>`;
+            html += `<div class="show-entry">${location} ${dateFormatted} at ${timeFormatted}</div>`;
           });
-
-          document.getElementById('dynamic-shows-output').innerHTML = html || "No valid shows found.";
+          output.innerHTML = html || "No valid shows found.";
         })
         .catch(err => {
           document.getElementById('dynamic-shows-output').textContent = "Fetch error: " + err.message;
@@ -172,15 +153,15 @@
     window.onload = () => {
       updatePage();
       setInterval(cycleCarousel, 4000);
+      loadDynamicShows();
+      setInterval(loadDynamicShows, 10000);
 
-      // Booking form submit handler
       const form = document.getElementById("booking-form");
       const scriptURL = "https://script.google.com/macros/s/AKfycby8uzyf8wH0ZteEoboa7p2a8xr7nwKD1ox2rCLEuJSNs_ODD-zvmolOL7z4CV2F3ap5uQ/exec";
 
       form.addEventListener("submit", (e) => {
         e.preventDefault();
         const formData = new FormData(form);
-
         fetch(scriptURL, {
           method: "POST",
           body: new URLSearchParams(formData),
@@ -200,13 +181,11 @@
         });
       });
 
-      // Newsletter signup button
       const newsletterBtn = document.getElementById("newsletter-btn");
       newsletterBtn.addEventListener("click", () => {
         const email = prompt("Enter your email to sign up for the newsletter:");
         if (!email || !email.includes("@")) return alert("Invalid email.");
-
-        fetch("https://script.google.com/macros/s/AKfycby8uzyf8wH0ZteEoboa7p2a8xr7nwKD1ox2rCLEuJSNs_ODD-zvmolOL7z4CV2F3ap5uQ/exec", {
+        fetch(scriptURL, {
           method: "POST",
           body: new URLSearchParams({ email, newsletter: "true" })
         })
@@ -223,10 +202,6 @@
           alert("❌ Failed to sign up.");
         });
       });
-
-      // Load dynamic upcoming shows first time and then every 10 seconds
-      loadDynamicShows();
-      setInterval(loadDynamicShows, 10000);
     };
   </script>
 </head>
@@ -239,7 +214,7 @@
     <nav class="nav-scroll">
       <div class="nav-bar">
         <button onclick="scrollToSection('about')">about</button>
-        <button onclick="scrollToSection('shows')">shows</button>
+        <button onclick="scrollToSection('live-upcoming')">shows</button>
         <button onclick="scrollToSection('gallery')">gallery</button>
         <button onclick="scrollToSection('booking')">booking</button>
         <button onclick="scrollToSection('socials-section')">socials</button>
@@ -261,11 +236,8 @@
     <img id="carousel-img" src="images/1.JPG" alt="Band Carousel" />
   </div>
 
-  <section id="shows">
-    <h2>Upcoming Shows</h2>
-    <div id="upcoming-shows">Default upcoming shows info here...</div>
-
-    <!-- NEW: Dynamic Upcoming Shows Output -->
+  <!-- 🔁 Reassigned section -->
+  <section id="live-upcoming">
     <div id="dynamic-shows-container" style="margin-top:20px; background:#222; padding:15px; border-radius:8px;">
       <h3 style="color:#00bfff;">Live Upcoming Shows</h3>
       <div id="dynamic-shows-output" style="color:#eee;">Loading shows...</div>
