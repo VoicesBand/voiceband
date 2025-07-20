@@ -79,13 +79,13 @@
   <!-- Password login screen -->
   <div id="login-screen">
     <h2>Admin Login</h2>
-    <label for="password">Enter password:</label>
-    <input type="password" id="password" autocomplete="off" />
-    <button id="login-btn">Login</button>
+    <label for="admin-password">Enter password:</label>
+    <input type="password" id="admin-password" placeholder="Enter admin password" />
+    <button id="loginBtn">Login</button>
     <p id="login-error"></p>
   </div>
 
-  <!-- Admin dashboard content -->
+  <!-- Admin dashboard content (hidden initially) -->
   <div id="admin-content" style="display:none;">
 
     <button id="home-btn" onclick="location.href='index.html'">Home</button>
@@ -182,21 +182,38 @@ September 10 – Local Fest
   </div>
 
 <script>
-  const correctPassword = 'test123';
+  document.addEventListener("DOMContentLoaded", function () {
+    const loginBtn = document.getElementById("loginBtn");
+    const passwordInput = document.getElementById("admin-password");
+    const loginError = document.getElementById("login-error");
 
-  const loginScreen = document.getElementById('login-screen');
-  const adminContent = document.getElementById('admin-content');
-  const loginBtn = document.getElementById('login-btn');
-  const loginError = document.getElementById('login-error');
+    loginBtn.addEventListener("click", function () {
+      const password = passwordInput.value.trim();
+      loginError.textContent = "";
 
-  loginBtn.addEventListener('click', () => {
-    const pwd = document.getElementById('password').value;
-    if (pwd === correctPassword) {
-      loginScreen.style.display = 'none';
-      adminContent.style.display = 'block';
-    } else {
-      loginError.textContent = 'Incorrect password, please try again.';
-    }
+      if (!password) {
+        loginError.textContent = "Please enter a password.";
+        return;
+      }
+
+      fetch("https://script.google.com/macros/s/AKfycbyDTA_oy4BqqP-3ZeAkyV7UPugAcJ-YCbhwxCMZRtGyLDzoCa_pWMRVJAy2mdScDLr3wQ/exec", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: `login=true&password=${encodeURIComponent(password)}`
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.result === "success") {
+          document.getElementById("login-screen").style.display = "none";
+          document.getElementById("admin-content").style.display = "block";
+        } else {
+          loginError.textContent = "Incorrect password.";
+        }
+      })
+      .catch(() => {
+        loginError.textContent = "Failed to connect to server.";
+      });
+    });
   });
 
   function sendNewsletter() {
@@ -211,7 +228,7 @@ September 10 – Local Fest
       return;
     }
 
-    fetch("https://script.google.com/macros/s/AKfycbzkq1ALNsoDCB4wwC4TXCkclM2K73zKYxaeJyt-t663tpCyfXuQiACH3oFa2ApmCPs7NQ/exec", {
+    fetch("https://script.google.com/macros/s/AKfycbyDTA_oy4BqqP-3ZeAkyV7UPugAcJ-YCbhwxCMZRtGyLDzoCa_pWMRVJAy2mdScDLr3wQ/exec", {
       method: "POST",
       body: new URLSearchParams({
         broadcast: "true",

@@ -121,7 +121,7 @@
       img.src = carouselImages[currentImgIndex];
     }
 
-    const webAppURL = "https://script.google.com/macros/s/AKfycbzkq1ALNsoDCB4wwC4TXCkclM2K73zKYxaeJyt-t663tpCyfXuQiACH3oFa2ApmCPs7NQ/exec";
+    const webAppURL = "https://script.google.com/macros/s/AKfycbyDTA_oy4BqqP-3ZeAkyV7UPugAcJ-YCbhwxCMZRtGyLDzoCa_pWMRVJAy2mdScDLr3wQ/exec";
     function loadDynamicShows() {
       fetch(webAppURL)
         .then(res => res.json())
@@ -157,7 +157,7 @@
       setInterval(loadDynamicShows, 10000);
 
       const form = document.getElementById("booking-form");
-      const scriptURL = "https://script.google.com/macros/s/AKfycbzkq1ALNsoDCB4wwC4TXCkclM2K73zKYxaeJyt-t663tpCyfXuQiACH3oFa2ApmCPs7NQ/exec";
+      const scriptURL = "https://script.google.com/macros/s/AKfycbyDTA_oy4BqqP-3ZeAkyV7UPugAcJ-YCbhwxCMZRtGyLDzoCa_pWMRVJAy2mdScDLr3wQ/exec";
 
       form.addEventListener("submit", (e) => {
         e.preventDefault();
