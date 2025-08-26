@@ -98,6 +98,28 @@ h2 {
   border-radius: 8px;
 }
 
+/* General image reset */
+img {
+    display: block;       /* removes inline spacing issues */
+    max-width: 100%;      /* ensures images fit their container */
+    height: auto;         /* preserves aspect ratio */
+}
+
+/* For a gallery or fixed-height container */
+.gallery img {
+    width: 100%;          /* fills container width */
+    max-height: 400px;    /* prevents images from being too tall */
+    object-fit: cover;    /* crops extra content to fill box */
+    border-radius: 5px;   /* optional: rounded corners */
+}
+
+/* Optional: responsive adjustments */
+@media (max-width: 768px) {
+    .gallery img {
+        max-height: 250px; /* smaller height on mobile */
+    }
+}
+
 /* Video Grid */
 .video-grid {
   display: grid;
@@ -213,4 +235,5 @@ footer {
     height: auto;
     aspect-ratio: 16/9;
   }
+
 }
