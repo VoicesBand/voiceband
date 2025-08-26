@@ -96,14 +96,6 @@ h2 {
   max-width: 800px;
   height: auto;
   border-radius: 8px;
-  margin: 0 auto;
-}
-
-/* General image reset */
-img {
-    display: block;       /* removes inline spacing issues */
-    max-width: 100%;      /* ensures images fit their container */
-    height: auto;         /* preserves aspect ratio */
 }
 
 /* For a gallery or fixed-height container */
@@ -238,4 +230,5 @@ footer {
   }
 
 }
+
 
