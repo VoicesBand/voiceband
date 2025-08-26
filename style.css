@@ -96,6 +96,7 @@ h2 {
   max-width: 800px;
   height: auto;
   border-radius: 8px;
+  margin: 0 auto;
 }
 
 /* General image reset */
@@ -237,3 +238,4 @@ footer {
   }
 
 }
+
