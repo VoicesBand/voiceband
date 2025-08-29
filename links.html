@@ -28,32 +28,41 @@
     /* Reset-ish */
     *{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
     html,body{height:100%}
-    body{
-      margin:0;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
-      color:var(--text);
-      background:
-        radial-gradient(1200px 600px at 80% -10%, rgba(143,99,255,.25), transparent 60%),
-        radial-gradient(900px 600px at -10% 120%, rgba(240,204,109,.18), transparent 60%),
-        linear-gradient(180deg, var(--bg2), var(--bg1) 50%, #0a0a10 100%);
-      display:grid;
-      place-items:center;
-      /* notch safe-areas */
-      padding: env(safe-area-inset-top) max(16px, env(safe-area-inset-right)) env(safe-area-inset-bottom) max(16px, env(safe-area-inset-left));
-    }
+    body {
+    margin:0;
+    font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+    color:var(--text);
+    background:
+      radial-gradient(1200px 600px at 80% -10%, rgba(143,99,255,.25), transparent 60%),
+      radial-gradient(900px 600px at -10% 120%, rgba(240,204,109,.18), transparent 60%),
+      linear-gradient(180deg, var(--bg2), var(--bg1) 50%, #0a0a10 100%);
+    display:flex;                 /* changed from grid */
+    justify-content:center;
+    align-items:center;
+    min-height:100%;              /* ensure body fills screen */
+    padding: calc(env(safe-area-inset-top, 0px) + 20px)
+             calc(env(safe-area-inset-right, 0px) + 16px)
+             calc(env(safe-area-inset-bottom, 0px) + 20px)
+             calc(env(safe-area-inset-left, 0px) + 16px);
+  }
 
-    .card{
-      width:min(720px, 100%);
-      background:rgba(20,20,40,.6);
-      backdrop-filter: blur(8px);
-      border:1px solid rgba(255,255,255,.06);
-      border-radius:20px;
-      padding:20px;
-      box-shadow:var(--shadow);
-      position:relative;
-      overflow:hidden;
-      isolation:isolate;
-    }
+  .card {
+    width: min(720px, 100%);
+    min-height: 92vh;             /* stretch card taller on mobile */
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between; /* push footer down */
+    background: rgba(20,20,40,.6);
+    backdrop-filter: blur(8px);
+    border:1px solid rgba(255,255,255,.06);
+    border-radius:20px;
+    padding:24px 20px;
+    box-shadow:var(--shadow);
+    position:relative;
+    overflow:hidden;
+    isolation:isolate;
+    margin:auto;                  /* center nicely */
+  }
 
     /* top glow band (like a subtle studio-light) */
     .card::before{
