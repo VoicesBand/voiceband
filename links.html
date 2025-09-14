@@ -7,196 +7,125 @@
   <title>VOICES • Links</title>
   <meta name="description" content="Quick links to Voices: website, booking, Facebook, YouTube, TikTok, Instagram." />
   <meta name="theme-color" content="#0b0b12" />
+  <link rel="icon" href="images/logoGTO.jpg" type="image/jpeg">
   <style>
     :root{
-      --bg1:#0b0b12;         /* near-black */
-      --bg2:#141428;         /* deep indigo */
-      --ac1:#8f63ff;         /* purple accent */
-      --ac2:#f0cc6d;         /* warm gold accent */
-      --text:#e9ebf0;
-      --muted:#a9afbd;
-      --btn:#17172b;
-      --btnHover:#1f1f38;
-      --ring:#5e49ff55;
-      --shadow: 0 20px 60px rgba(0,0,0,.5), 0 0 80px rgba(143,99,255,.15);
-      --radius:18px;
-      --tap:56px; /* min tap height */
+      --bg1:#0b0b12; --bg2:#141428; --ac1:#8f63ff; --ac2:#f0cc6d;
+      --text:#e9ebf0; --muted:#a9afbd; --btn:#17172b; --btnHover:#1f1f38;
+      --ring:#5e49ff55; --shadow: 0 20px 60px rgba(0,0,0,.5), 0 0 80px rgba(143,99,255,.15);
+      --radius:18px; --tap:56px;
     }
 
-    /* Reset-ish */
     *{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
     html,body{height:100%}
-    body {
-      margin:0;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+    body{
+      margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
       color:var(--text);
       background:
         radial-gradient(1200px 600px at 80% -10%, rgba(143,99,255,.25), transparent 60%),
         radial-gradient(900px 600px at -10% 120%, rgba(240,204,109,.18), transparent 60%),
         linear-gradient(180deg, var(--bg2), var(--bg1) 50%, #0a0a10 100%);
-      display:flex;
-      justify-content:center;
-      align-items:center;
-      min-height:100%;
+      display:flex; justify-content:center; align-items:center; min-height:100%;
       padding: calc(env(safe-area-inset-top, 0px) + 20px)
                calc(env(safe-area-inset-right, 0px) + 16px)
                calc(env(safe-area-inset-bottom, 0px) + 20px)
                calc(env(safe-area-inset-left, 0px) + 16px);
     }
 
-    .card {
-      width: min(720px, 100%);
-      min-height: 92vh;
-      display:flex;
-      flex-direction:column;
-      justify-content:space-between;
-      background: rgba(20,20,40,.6);
-      backdrop-filter: blur(8px);
-      border:1px solid rgba(255,255,255,.06);
-      border-radius:20px;
-      padding:24px 20px;
-      box-shadow:var(--shadow);
-      position:relative;
-      overflow:hidden;
-      isolation:isolate;
-      margin:auto;
+    .card{
+      width:min(720px,100%); min-height:92vh;
+      display:flex; flex-direction:column; justify-content:space-between;
+      background:rgba(20,20,40,.6); backdrop-filter:blur(8px);
+      border:1px solid rgba(255,255,255,.06); border-radius:20px;
+      padding:24px 20px; box-shadow:var(--shadow); position:relative; overflow:hidden; isolation:isolate; margin:auto;
     }
-
-    /* top glow band */
     .card::before{
-      content:"";
-      position:absolute; inset:0;
+      content:""; position:absolute; inset:0;
       background:
         radial-gradient(1200px 200px at 50% -40px, rgba(143,99,255,.22), transparent 60%),
         radial-gradient(800px 150px at 50% -60px, rgba(240,204,109,.16), transparent 60%);
       z-index:-1;
     }
 
-    header{
-      display:flex; align-items:center; gap:12px;
-      margin-bottom:14px;
-    }
+    header{display:flex; align-items:center; gap:12px; margin-bottom:14px;}
     .logo{
       width:48px; height:48px; border-radius:12px;
       background:
         linear-gradient(135deg, rgba(143,99,255,.35), rgba(240,204,109,.25)),
         linear-gradient(135deg, #2a2746, #191a2e);
-      box-shadow: 0 6px 22px rgba(143,99,255,.25);
-      display:grid; place-items:center;
-      color:#fff; font-weight:800; letter-spacing:1px;
-      user-select:none;
-      font-size:1.05rem;
+      box-shadow:0 6px 22px rgba(143,99,255,.25);
+      display:grid; place-items:center; color:#fff; font-weight:800; letter-spacing:1px; font-size:1.05rem;
     }
-    .title{
-      line-height:1.1;
-    }
-    .title h1{
-      font-size:clamp(1.15rem, 1.2rem + 1.2vw, 1.6rem);
-      margin:0 0 4px 0; letter-spacing:.4px;
-    }
-    .title p{
-      margin:0; color:var(--muted);
-      font-size:clamp(.9rem, .85rem + .4vw, 1rem);
-    }
+    .title h1{font-size:clamp(1.15rem, 1.2rem + 1.2vw, 1.6rem); margin:0 0 4px 0; letter-spacing:.4px;}
+    .title p{margin:0; color:var(--muted); font-size:clamp(.9rem, .85rem + .4vw, 1rem);}
 
-    /* PHOTO: container auto-sizes to image height (no extra space) */
     .photo{
-      width:100%;
-      border-radius:16px;
-      overflow:hidden; position:relative; margin:8px 0 16px 0;
-      border:1px solid rgba(255,255,255,.06);
-      background:#0e0e16;
-      display:block; /* let content define height */
+      width:100%; border-radius:16px; overflow:hidden; position:relative; margin:8px 0 16px 0;
+      border:1px solid rgba(255,255,255,.06); background:#0e0e16; display:block;
     }
-    /* Blurred backdrop—same size as image; subtle edge polish */
-    .photo::before {
-      content:"";
-      position:absolute; inset:0;
-      background:url("/images/banner.jpg") center/cover no-repeat;
-      filter:blur(16px) brightness(0.75);
-      transform:scale(1.06);
-      z-index:0;
+    .photo::before{
+      content:""; position:absolute; inset:0; background:url("/images/banner.jpg") center/cover no-repeat;
+      filter:blur(16px) brightness(0.75); transform:scale(1.06); z-index:0;
     }
     .photo img{
-      position:relative;
-      z-index:1;
-      display:block;
-      width:100%;
-      height:auto;               /* key: image dictates container height */
-      object-fit:contain;        /* keep everyone in frame */
+      position:relative; z-index:1; display:block; width:100%; height:auto; object-fit:contain;
       filter:saturate(1.06) contrast(1.06) brightness(.94);
     }
-    /* soft bottom fade for nicer blend into dark card */
     .photo::after{
-      content:"";
-      position:absolute; inset:0;
-      background:
-        linear-gradient(180deg, rgba(11,11,18,0) 0%, rgba(11,11,18,.22) 58%, rgba(11,11,18,.58) 78%, rgba(11,11,18,.78) 100%);
-      pointer-events:none;
-      z-index:2;
+      content:""; position:absolute; inset:0;
+      background:linear-gradient(180deg, rgba(11,11,18,0) 0%, rgba(11,11,18,.22) 58%, rgba(11,11,18,.58) 78%, rgba(11,11,18,.78) 100%);
+      pointer-events:none; z-index:2;
     }
 
-    .links{
-      display:grid; gap:12px; margin-top:6px;
+    /* ===== Shows Carousel ===== */
+    .shows{
+      position:relative; border:1px solid rgba(255,255,255,.08); background:linear-gradient(180deg,#15152a,#101024);
+      border-radius:14px; padding:12px 14px 24px; margin:4px 0 14px; overflow:hidden; min-height:64px; display:flex; align-items:center;
     }
+    .show-track{position:relative; width:100%; height:100%;}
+    .show-card{
+      position:absolute; inset:0; display:flex; align-items:center; gap:10px; padding:4px 2px;
+      opacity:0; transform:translateY(10px); transition:opacity .5s ease, transform .5s ease; will-change:opacity, transform;
+    }
+    .show-card.active{opacity:1; transform:translateY(0)}
+    .tag{
+      font-size:.78rem; letter-spacing:.3px; padding:6px 10px; border-radius:999px;
+      background:linear-gradient(135deg, rgba(143,99,255,.22), rgba(240,204,109,.18));
+      border:1px solid rgba(255,255,255,.08); white-space:nowrap; flex:0 0 auto;
+    }
+    .show-text{line-height:1.2; font-size:clamp(.95rem, .92rem + .2vw, 1.05rem);}
+    .show-text strong{font-weight:800}
+    .show-text a{color:#cfc7ff; text-decoration:none; border-bottom:1px dashed rgba(207,199,255,.4);}
+    .show-text a:hover{text-decoration:underline}
+    .dots{position:absolute; right:10px; top:50%; transform:translateY(-50%); display:flex; gap:6px; pointer-events:none;}
+    .dot{width:6px; height:6px; border-radius:50%; background:rgba(255,255,255,.28); box-shadow:0 0 0 1px rgba(255,255,255,.08) inset; opacity:.6;}
+    .dot.active{opacity:1; background:#e9ebf0}
+    .status{position:absolute; left:14px; right:14px; bottom:6px; font-size:.8rem; opacity:.75;}
 
+    .links{display:grid; gap:12px; margin-top:6px;}
     .btn{
-      display:flex; align-items:center; gap:12px;
-      width:100%;
-      min-height:var(--tap);
-      background:linear-gradient(180deg, var(--btn), #151529);
-      color:var(--text); text-decoration:none; font-weight:700;
-      letter-spacing:.2px;
-      padding:14px 16px; border-radius:14px; border:1px solid rgba(255,255,255,.06);
-      box-shadow: 0 6px 24px rgba(0,0,0,.35);
-      transition: transform .08s ease, background .15s ease, border-color .15s ease, box-shadow .15s ease, opacity .2s ease;
-      outline: none;
-      touch-action: manipulation;
+      display:flex; align-items:center; gap:12px; width:100%; min-height:var(--tap);
+      background:linear-gradient(180deg, var(--btn), #151529); color:var(--text); text-decoration:none; font-weight:700; letter-spacing:.2px;
+      padding:14px 16px; border-radius:14px; border:1px solid rgba(255,255,255,.06); box-shadow:0 6px 24px rgba(0,0,0,.35);
+      transition:transform .08s ease, background .15s ease, border-color .15s ease, box-shadow .15s ease, opacity .2s ease; outline:none; touch-action:manipulation;
     }
     .btn:hover, .btn:focus-visible{
-      transform: translateY(-1px);
-      background:linear-gradient(180deg, var(--btnHover), #191a33);
-      border-color: rgba(143,99,255,.35);
-      box-shadow: 0 10px 30px rgba(143,99,255,.18), 0 2px 0 0 var(--ring) inset;
+      transform:translateY(-1px); background:linear-gradient(180deg, var(--btnHover), #191a33);
+      border-color:rgba(143,99,255,.35); box-shadow:0 10px 30px rgba(143,99,255,.18), 0 2px 0 0 var(--ring) inset;
     }
-    .btn:active{ transform: translateY(1px); opacity:.96 }
+    .btn:active{transform:translateY(1px); opacity:.96}
+    .icon{width:24px; height:24px; display:grid; place-items:center; flex:0 0 auto;}
+    .btn span:last-child{font-size:clamp(1rem, .98rem + .3vw, 1.08rem); line-height:1.2;}
 
-    .icon{
-      width:24px; height:24px; display:grid; place-items:center; flex:0 0 auto;
-    }
-    .btn span:last-child{
-      font-size:clamp(1rem, .98rem + .3vw, 1.08rem);
-      line-height:1.2;
-    }
+    .meta{margin-top:14px; color:var(--muted); font-size:.9rem; text-align:center;}
+    footer{margin-top:16px; display:flex; justify-content:center; gap:14px; flex-wrap:wrap; color:var(--muted); font-size:.9rem;}
+    footer a{color:#cfc7ff; text-decoration:none;} footer a:hover{text-decoration:underline;}
 
-    .meta{
-      margin-top:14px; color:var(--muted); font-size:.9rem; text-align:center;
-    }
-    .qr-tip{
-      margin-top:4px; color:#cfc7ff; font-size:.84rem; text-align:center;
-    }
-
-    footer{
-      margin-top:16px; display:flex; justify-content:center; gap:14px; flex-wrap:wrap;
-      color:var(--muted); font-size:.9rem;
-    }
-    footer a{ color:#cfc7ff; text-decoration:none; }
-    footer a:hover{ text-decoration:underline; }
-
-    /* Reduced motion */
     @media (prefers-reduced-motion: reduce){
-      .btn{ transition:none }
-      .btn:hover, .btn:focus-visible{ transform:none }
-      .photo img{ transform:none }
+      .btn{transition:none} .btn:hover,.btn:focus-visible{transform:none}
+      .photo img{transform:none} .show-card{transition:none}
     }
-
-    /* Desktop/larger tweaks */
-    @media (min-width:640px){
-      .card{ padding:24px 26px }
-      .links{ gap:14px }
-      .btn{ padding:16px 18px }
-      .icon{ width:22px; height:22px }
-    }
+    @media (min-width:640px){ .card{padding:24px 26px} .links{gap:14px} .btn{padding:16px 18px} .icon{width:22px; height:22px}}
   </style>
 </head>
 <body>
@@ -209,16 +138,22 @@
       </div>
     </header>
 
-    <!-- Photo: container height now equals image height -->
+    <!-- Banner -->
     <div class="photo">
       <img src="images/banner.jpg" alt="All VOICES band members" loading="eager" decoding="async">
     </div>
+
+    <!-- ===== Upcoming Shows Carousel (LIVE from Apps Script) ===== -->
+    <section class="shows" id="shows" aria-label="Upcoming shows" aria-live="polite">
+      <div class="show-track" id="showTrack"></div>
+      <div class="dots" id="dots" aria-hidden="true"></div>
+      <div class="status" id="showsStatus">Loading upcoming shows…</div>
+    </section>
 
     <nav class="links" aria-label="Quick links">
       <!-- Website / Booking -->
       <a class="btn" href="https://voices.band" target="_blank" rel="noopener noreferrer">
         <span class="icon" aria-hidden="true">
-          <!-- link / chain -->
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
             <path d="M10.5 13.5l3-3M9 7h6a4 4 0 010 8H9a4 4 0 010-8z" stroke="url(#g1)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
             <defs><linearGradient id="g1" x1="0" x2="24" y1="0" y2="24"><stop stop-color="#cfc7ff"/><stop offset="1" stop-color="#f0cc6d"/></linearGradient></defs>
@@ -230,7 +165,6 @@
       <!-- Facebook -->
       <a class="btn" href="https://www.facebook.com/voicessing/" target="_blank" rel="noopener noreferrer">
         <span class="icon" aria-hidden="true">
-          <!-- fb -->
           <svg viewBox="0 0 24 24" width="24" height="24" fill="none" aria-hidden="true">
             <path d="M14 9h3V6h-3a3 3 0 00-3 3v2H8v3h3v6h3v-6h2.5l.5-3H14V9a1 1 0 011-1z" fill="#cfc7ff"/>
           </svg>
@@ -241,7 +175,6 @@
       <!-- YouTube -->
       <a class="btn" href="https://youtube.com/@VoicesSTL" target="_blank" rel="noopener noreferrer">
         <span class="icon" aria-hidden="true">
-          <!-- yt -->
           <svg viewBox="0 0 24 24" width="24" height="24" fill="none">
             <rect x="2" y="6" width="20" height="12" rx="3" fill="#ff6b6b" opacity=".9"></rect>
             <path d="M10 9.5v5l5-2.5-5-2.5z" fill="#fff"></path>
@@ -253,7 +186,6 @@
       <!-- TikTok -->
       <a class="btn" href="https://www.tiktok.com/@voicesbandofficial" target="_blank" rel="noopener noreferrer">
         <span class="icon" aria-hidden="true">
-          <!-- tiktok -->
           <svg viewBox="0 0 24 24" width="24" height="24" fill="none">
             <path d="M15 3v3.4a5.6 5.6 0 004 1.6V12a9.1 9.1 0 01-4-1.1v4.1A5.9 5.9 0 119 9.2v3.3a2.6 2.6 0 102.6 2.6V3h3.4z" fill="#cfc7ff"/>
           </svg>
@@ -264,7 +196,6 @@
       <!-- Instagram -->
       <a class="btn" href="https://www.instagram.com/voicesmusicofficial/" target="_blank" rel="noopener noreferrer">
         <span class="icon" aria-hidden="true">
-          <!-- ig -->
           <svg viewBox="0 0 24 24" width="24" height="24" fill="none">
             <rect x="3" y="3" width="18" height="18" rx="5" stroke="#cfc7ff" stroke-width="2"></rect>
             <circle cx="12" cy="12" r="4.2" stroke="#cfc7ff" stroke-width="2"></circle>
@@ -284,8 +215,217 @@
   </main>
 
   <script>
-    // year stamp
+    // Year stamp
     document.getElementById('yr').textContent = new Date().getFullYear();
+
+    // ===== Helpers (match homepage display) =====
+    function formatDateString(dateStr) {
+      if (!dateStr) return '';
+      const dateObj = new Date(dateStr);
+      if (isNaN(dateObj.getTime())) return '';
+      const monthNames = ["JAN.", "FEB.", "MAR.", "APR.", "MAY", "JUN.", "JUL.", "AUG.", "SEP.", "OCT.", "NOV.", "DEC."];
+      const day = dateObj.getDate();
+      function ordinalSuffix(n) {
+        if (n > 3 && n < 21) return n + "th";
+        switch (n % 10) {
+          case 1: return n + "st";
+          case 2: return n + "nd";
+          case 3: return n + "rd";
+          default: return n + "th";
+        }
+      }
+      return `${monthNames[dateObj.getMonth()]} ${ordinalSuffix(day)}`;
+    }
+
+    function formatTimeForDisplay(timeValue) {
+      if (!timeValue) return "Time TBD";
+      if (typeof timeValue === 'string') {
+        const parsedDate = new Date(timeValue);
+        if (!isNaN(parsedDate.getTime())) {
+          timeValue = parsedDate;
+        } else {
+          const trimmed = timeValue.trim();
+          return trimmed.length > 0 ? trimmed : "Time TBD";
+        }
+      }
+      if (timeValue instanceof Date && !isNaN(timeValue.getTime())) {
+        let hours = timeValue.getHours();
+        let minutes = timeValue.getMinutes();
+        let ampm = hours >= 12 ? "PM" : "AM";
+        hours = hours % 12;
+        if (hours === 0) hours = 12;
+        let minutesStr = minutes === 0 ? "" : ":" + (minutes < 10 ? "0" + minutes : minutes);
+        return `${hours}${minutesStr}${ampm}`;
+      }
+      return "Time TBD";
+    }
+
+    // ===== Live fetch from the SAME Apps Script as homepage =====
+    const webAppURL = "https://script.google.com/macros/s/AKfycbyDTA_oy4BqqP-3ZeAkyV7UPugAcJ-YCbhwxCMZRtGyLDzoCa_pWMRVJAy2mdScDLr3wQ/exec";
+    const POLL_MS = 15000; // refresh every 15s
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const today = new Date(); today.setHours(0,0,0,0);
+
+    const showsEl  = document.getElementById('shows');
+    const trackEl  = document.getElementById('showTrack');
+    const dotsEl   = document.getElementById('dots');
+    const statusEl = document.getElementById('showsStatus');
+
+    function normalize(raw){
+      return (raw || []).map(s => ({
+        date:  s.Date,
+        time:  s.Time,
+        title: s.Location || "Show",
+        city:  s.City || "",
+        map:   s.Map || ""
+      }))
+      .filter(s => {
+        if (!s.date) return false;
+        const d = new Date(s.date); d.setHours(0,0,0,0);
+        return d >= today;
+      })
+      .sort((a,b) => new Date(a.date) - new Date(b.date));
+    }
+
+    function hash(obj){ return JSON.stringify(obj); }
+
+    let cards = [];
+    let dots  = [];
+    let idx   = 0;
+    let rotateTimer = null;
+    let pollTimer   = null;
+    let lastHash    = "";
+
+    function clearChildren(node){ while(node.firstChild) node.removeChild(node.firstChild); }
+
+    function activate(i){
+      cards.forEach((c,j)=>c.classList.toggle('active', j===i));
+      dots.forEach((d,j)=>d.classList.toggle('active', j===i));
+    }
+
+    function startRotate(){
+      if (prefersReduced) return;
+      stopRotate();
+      rotateTimer = setInterval(()=>{ idx = (idx + 1) % cards.length; activate(idx); }, 4000);
+    }
+    function stopRotate(){ if (rotateTimer){ clearInterval(rotateTimer); rotateTimer = null; } }
+
+    function render(upcoming){
+      // remember current slide venue to preserve position if possible
+      const currentVenue = cards[idx]?.querySelector('.show-text strong')?.textContent || null;
+
+      clearChildren(trackEl);
+      clearChildren(dotsEl);
+      cards = []; dots = [];
+
+      upcoming.forEach((s,i)=>{
+        const card = document.createElement('div');
+        card.className = 'show-card';
+
+        const tag = document.createElement('div');
+        tag.className = 'tag';
+        tag.textContent = `${new Date(s.date).toLocaleDateString(undefined,{ weekday:'short' })} • ${formatDateString(s.date)}`;
+
+        const text = document.createElement('div'); text.className = 'show-text';
+
+        const where = document.createElement(s.map ? 'a' : 'span');
+        if (s.map){ where.href = s.map; where.target = "_blank"; where.rel = "noopener noreferrer"; }
+        where.innerHTML = `<strong>${s.title}</strong>${s.city ? ` — ${s.city}` : ''}`;
+
+        const time = document.createElement('div');
+        time.textContent = formatTimeForDisplay(s.time);
+        time.style.opacity = .9;
+
+        text.appendChild(where); text.appendChild(time);
+        card.appendChild(tag); card.appendChild(text);
+        trackEl.appendChild(card);
+
+        const dot = document.createElement('span'); dot.className = 'dot'; dotsEl.appendChild(dot);
+
+        cards.push(card); dots.push(dot);
+      });
+
+      // pick slide: try to keep the same venue; else clamp to 0
+      const newIndex = currentVenue ? cards.findIndex(c => c.querySelector('.show-text strong')?.textContent === currentVenue) : 0;
+      idx = newIndex >= 0 ? newIndex : 0;
+      activate(idx);
+
+      // (re)start rotation
+      startRotate();
+    }
+
+    async function fetchShows(){
+      const res = await fetch(webAppURL + "?_=" + Date.now(), { cache: "no-store", mode: "cors" });
+      if (!res.ok) throw new Error("Apps Script fetch failed: " + res.status);
+      const data = await res.json();
+      return normalize(data);
+    }
+
+    async function refresh(){
+      if (document.hidden) return; // skip when tab not visible
+      try{
+        const upcoming = await fetchShows();
+        const h = hash(upcoming);
+        if (h !== lastHash){
+          lastHash = h;
+          statusEl.textContent = upcoming.length ? "" : "No upcoming shows yet — check back soon!";
+          if (!upcoming.length){
+            stopRotate();
+            trackEl.innerHTML = `<div class="show-card active"><div class="tag">— • —</div><div class="show-text">No upcoming shows yet</div></div>`;
+            clearChildren(dotsEl);
+            cards = Array.from(trackEl.children);
+            dots  = [];
+          } else {
+            render(upcoming);
+          }
+        }
+      } catch(err){
+        console.error("[Links] fetch error:", err);
+        statusEl.textContent = "Couldn’t load shows. Check connection or Apps Script.";
+        // keep whatever is currently displayed; no hard failure
+      }
+    }
+
+    (async function init(){
+      // Initial load
+      await refresh();
+
+      // Hover/focus pause
+      showsEl.addEventListener('mouseenter', stopRotate);
+      showsEl.addEventListener('mouseleave', startRotate);
+      showsEl.addEventListener('focusin',  stopRotate);
+      showsEl.addEventListener('focusout', startRotate);
+
+      // Swipe
+      let x0 = null;
+      showsEl.addEventListener('touchstart', e => { x0 = e.touches[0].clientX; }, {passive:true});
+      showsEl.addEventListener('touchend', e => {
+        if (x0 == null || !cards.length) return;
+        const dx = e.changedTouches[0].clientX - x0;
+        if (Math.abs(dx) > 30){
+          idx = (idx + (dx < 0 ? 1 : -1) + cards.length) % cards.length;
+          activate(idx);
+        }
+        x0 = null;
+      });
+
+      // Keyboard
+      showsEl.tabIndex = 0;
+      showsEl.addEventListener('keydown', e => {
+        if (!cards.length) return;
+        if (e.key === 'ArrowRight'){ idx = (idx + 1) % cards.length; activate(idx); e.preventDefault(); }
+        if (e.key === 'ArrowLeft'){  idx = (idx - 1 + cards.length) % cards.length; activate(idx); e.preventDefault(); }
+      });
+
+      // Poll for updates
+      function startPoll(){ if (!pollTimer) pollTimer = setInterval(refresh, POLL_MS); }
+      function stopPoll(){ if (pollTimer){ clearInterval(pollTimer); pollTimer = null; } }
+      document.addEventListener('visibilitychange', () => {
+        if (document.hidden) { stopPoll(); stopRotate(); }
+        else { startPoll(); startRotate(); refresh(); }
+      });
+      startPoll();
+    })();
   </script>
 </body>
 </html>
