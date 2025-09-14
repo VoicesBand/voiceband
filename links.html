@@ -77,30 +77,43 @@
       pointer-events:none; z-index:2;
     }
 
-    /* ===== Shows Carousel ===== */
+    /* ===== Shows (auto-height) ===== */
     .shows{
-      position:relative; border:1px solid rgba(255,255,255,.08); background:linear-gradient(180deg,#15152a,#101024);
-      border-radius:14px; padding:12px 14px 24px; margin:4px 0 14px; overflow:hidden; min-height:64px; display:flex; align-items:center;
+      border:1px solid rgba(255,255,255,.08); background:linear-gradient(180deg,#15152a,#101024);
+      border-radius:14px; padding:12px 14px; margin:4px 0 14px;
+      display:flex; flex-direction:column; gap:8px;
     }
-    .show-track{position:relative; width:100%; height:100%;}
+    .show-track{width:100%;}
     .show-card{
-      position:absolute; inset:0; display:flex; align-items:center; gap:10px; padding:4px 2px;
-      opacity:0; transform:translateY(10px); transition:opacity .5s ease, transform .5s ease; will-change:opacity, transform;
+      /* no absolute positioning; only active slide is displayed */
+      display:none;
+      align-items:flex-start; gap:10px; padding:4px 2px;
+      opacity:0; transform:translateY(4px);
+      transition:opacity .2s ease, transform .2s ease;
     }
-    .show-card.active{opacity:1; transform:translateY(0)}
+    .show-card.active{display:flex; opacity:1; transform:translateY(0)}
     .tag{
       font-size:.78rem; letter-spacing:.3px; padding:6px 10px; border-radius:999px;
       background:linear-gradient(135deg, rgba(143,99,255,.22), rgba(240,204,109,.18));
       border:1px solid rgba(255,255,255,.08); white-space:nowrap; flex:0 0 auto;
     }
-    .show-text{line-height:1.2; font-size:clamp(.95rem, .92rem + .2vw, 1.05rem);}
-    .show-text strong{font-weight:800}
-    .show-text a{color:#cfc7ff; text-decoration:none; border-bottom:1px dashed rgba(207,199,255,.4);}
-    .show-text a:hover{text-decoration:underline}
-    .dots{position:absolute; right:10px; top:50%; transform:translateY(-50%); display:flex; gap:6px; pointer-events:none;}
+    .show-text{line-height:1.25; font-size:clamp(.95rem, .92rem + .2vw, 1.05rem); min-width:0;}
+    .show-text .where{display:block; white-space:normal; overflow:visible;}
+    .show-text .time{opacity:.9; font-size:.92em; margin-top:2px;}
+    .show-text a.where{color:#cfc7ff; text-decoration:none; border-bottom:1px dashed rgba(207,199,255,.4);}
+    .show-text a.where:hover{text-decoration:underline}
+
+    /* Place dots below content so they never overlap text */
+    .dots{display:flex; gap:6px; align-self:flex-end;}
     .dot{width:6px; height:6px; border-radius:50%; background:rgba(255,255,255,.28); box-shadow:0 0 0 1px rgba(255,255,255,.08) inset; opacity:.6;}
     .dot.active{opacity:1; background:#e9ebf0}
-    .status{position:absolute; left:14px; right:14px; bottom:6px; font-size:.8rem; opacity:.75;}
+
+    .status{font-size:.8rem; opacity:.75;}
+
+    /* Narrow phones: let venue wrap, no layout shifts */
+    @media (max-width:360px){
+      .show-card{padding-right:0}
+    }
 
     .links{display:grid; gap:12px; margin-top:6px;}
     .btn{
@@ -125,7 +138,6 @@
       .btn{transition:none} .btn:hover,.btn:focus-visible{transform:none}
       .photo img{transform:none} .show-card{transition:none}
     }
-    @media (min-width:640px){ .card{padding:24px 26px} .links{gap:14px} .btn{padding:16px 18px} .icon{width:22px; height:22px}}
   </style>
 </head>
 <body>
@@ -143,7 +155,7 @@
       <img src="images/banner.jpg" alt="All VOICES band members" loading="eager" decoding="async">
     </div>
 
-    <!-- ===== Upcoming Shows Carousel (LIVE from Apps Script) ===== -->
+    <!-- ===== Upcoming Shows (auto-height) ===== -->
     <section class="shows" id="shows" aria-label="Upcoming shows" aria-live="polite">
       <div class="show-track" id="showTrack"></div>
       <div class="dots" id="dots" aria-hidden="true"></div>
@@ -218,7 +230,7 @@
     // Year stamp
     document.getElementById('yr').textContent = new Date().getFullYear();
 
-    // ===== Helpers (match homepage display) =====
+    // Helpers (match homepage display)
     function formatDateString(dateStr) {
       if (!dateStr) return '';
       const dateObj = new Date(dateStr);
@@ -236,7 +248,6 @@
       }
       return `${monthNames[dateObj.getMonth()]} ${ordinalSuffix(day)}`;
     }
-
     function formatTimeForDisplay(timeValue) {
       if (!timeValue) return "Time TBD";
       if (typeof timeValue === 'string') {
@@ -260,9 +271,9 @@
       return "Time TBD";
     }
 
-    // ===== Live fetch from the SAME Apps Script as homepage =====
+    // Live fetch from Apps Script (same as homepage)
     const webAppURL = "https://script.google.com/macros/s/AKfycbyDTA_oy4BqqP-3ZeAkyV7UPugAcJ-YCbhwxCMZRtGyLDzoCa_pWMRVJAy2mdScDLr3wQ/exec";
-    const POLL_MS = 15000; // refresh every 15s
+    const POLL_MS = 15000;
     const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const today = new Date(); today.setHours(0,0,0,0);
 
@@ -286,7 +297,6 @@
       })
       .sort((a,b) => new Date(a.date) - new Date(b.date));
     }
-
     function hash(obj){ return JSON.stringify(obj); }
 
     let cards = [];
@@ -302,23 +312,21 @@
       cards.forEach((c,j)=>c.classList.toggle('active', j===i));
       dots.forEach((d,j)=>d.classList.toggle('active', j===i));
     }
-
     function startRotate(){
-      if (prefersReduced) return;
+      if (prefersReduced || !cards.length) return;
       stopRotate();
       rotateTimer = setInterval(()=>{ idx = (idx + 1) % cards.length; activate(idx); }, 4000);
     }
     function stopRotate(){ if (rotateTimer){ clearInterval(rotateTimer); rotateTimer = null; } }
 
     function render(upcoming){
-      // remember current slide venue to preserve position if possible
-      const currentVenue = cards[idx]?.querySelector('.show-text strong')?.textContent || null;
+      const currentVenue = cards[idx]?.querySelector('.where strong')?.textContent || null;
 
       clearChildren(trackEl);
       clearChildren(dotsEl);
       cards = []; dots = [];
 
-      upcoming.forEach((s,i)=>{
+      upcoming.forEach((s)=>{
         const card = document.createElement('div');
         card.className = 'show-card';
 
@@ -329,12 +337,14 @@
         const text = document.createElement('div'); text.className = 'show-text';
 
         const where = document.createElement(s.map ? 'a' : 'span');
+        where.className = 'where';
         if (s.map){ where.href = s.map; where.target = "_blank"; where.rel = "noopener noreferrer"; }
+        where.title = s.city ? `${s.title} — ${s.city}` : s.title;
         where.innerHTML = `<strong>${s.title}</strong>${s.city ? ` — ${s.city}` : ''}`;
 
         const time = document.createElement('div');
+        time.className = 'time';
         time.textContent = formatTimeForDisplay(s.time);
-        time.style.opacity = .9;
 
         text.appendChild(where); text.appendChild(time);
         card.appendChild(tag); card.appendChild(text);
@@ -345,12 +355,10 @@
         cards.push(card); dots.push(dot);
       });
 
-      // pick slide: try to keep the same venue; else clamp to 0
-      const newIndex = currentVenue ? cards.findIndex(c => c.querySelector('.show-text strong')?.textContent === currentVenue) : 0;
+      // find index by venue, else 0
+      const newIndex = currentVenue ? cards.findIndex(c => c.querySelector('.where strong')?.textContent === currentVenue) : 0;
       idx = newIndex >= 0 ? newIndex : 0;
       activate(idx);
-
-      // (re)start rotation
       startRotate();
     }
 
@@ -362,7 +370,7 @@
     }
 
     async function refresh(){
-      if (document.hidden) return; // skip when tab not visible
+      if (document.hidden) return;
       try{
         const upcoming = await fetchShows();
         const h = hash(upcoming);
@@ -371,7 +379,7 @@
           statusEl.textContent = upcoming.length ? "" : "No upcoming shows yet — check back soon!";
           if (!upcoming.length){
             stopRotate();
-            trackEl.innerHTML = `<div class="show-card active"><div class="tag">— • —</div><div class="show-text">No upcoming shows yet</div></div>`;
+            trackEl.innerHTML = `<div class="show-card active"><div class="tag">— • —</div><div class="show-text"><span class="where">No upcoming shows yet</span><div class="time"></div></div></div>`;
             clearChildren(dotsEl);
             cards = Array.from(trackEl.children);
             dots  = [];
@@ -382,15 +390,15 @@
       } catch(err){
         console.error("[Links] fetch error:", err);
         statusEl.textContent = "Couldn’t load shows. Check connection or Apps Script.";
-        // keep whatever is currently displayed; no hard failure
       }
     }
 
+    function startPoll(){ if (!pollTimer) pollTimer = setInterval(refresh, POLL_MS); }
+    function stopPoll(){ if (pollTimer){ clearInterval(pollTimer); pollTimer = null; } }
+
     (async function init(){
-      // Initial load
       await refresh();
 
-      // Hover/focus pause
       showsEl.addEventListener('mouseenter', stopRotate);
       showsEl.addEventListener('mouseleave', startRotate);
       showsEl.addEventListener('focusin',  stopRotate);
@@ -417,9 +425,7 @@
         if (e.key === 'ArrowLeft'){  idx = (idx - 1 + cards.length) % cards.length; activate(idx); e.preventDefault(); }
       });
 
-      // Poll for updates
-      function startPoll(){ if (!pollTimer) pollTimer = setInterval(refresh, POLL_MS); }
-      function stopPoll(){ if (pollTimer){ clearInterval(pollTimer); pollTimer = null; } }
+      // Poll for updates, pause when tab hidden
       document.addEventListener('visibilitychange', () => {
         if (document.hidden) { stopPoll(); stopRotate(); }
         else { startPoll(); startRotate(); refresh(); }
