@@ -34,7 +34,7 @@
 
     .card{
       width:min(720px,100%); min-height:92vh;
-      display:flex; flex-direction:column; justify-content:space-between;
+      display:flex; flex-direction:column; gap:16px; /* CHANGED: no space-between */
       background:rgba(20,20,40,.6); backdrop-filter:blur(8px);
       border:1px solid rgba(255,255,255,.06); border-radius:20px;
       padding:24px 20px; box-shadow:var(--shadow); position:relative; overflow:hidden; isolation:isolate; margin:auto;
@@ -47,7 +47,7 @@
       z-index:-1;
     }
 
-    header{display:flex; align-items:center; gap:12px; margin-bottom:14px;}
+    header{display:flex; align-items:center; gap:12px; margin-bottom:4px;}
     .logo{
       width:48px; height:48px; border-radius:12px;
       background:
@@ -60,11 +60,11 @@
     .title p{margin:0; color:var(--muted); font-size:clamp(.9rem, .85rem + .4vw, 1rem);}
 
     .photo{
-      width:100%; border-radius:16px; overflow:hidden; position:relative; margin:8px 0 16px 0;
+      width:100%; border-radius:16px; overflow:hidden; position:relative; margin:4px 0 0 0;
       border:1px solid rgba(255,255,255,.06); background:#0e0e16; display:block;
     }
     .photo::before{
-      content:""; position:absolute; inset:0; background:url("/images/banner.jpg") center/cover no-repeat;
+      content:""; position:absolute; inset:0; background:url("images/banner.jpg") center/cover no-repeat;
       filter:blur(16px) brightness(0.75); transform:scale(1.06); z-index:0;
     }
     .photo img{
@@ -80,12 +80,11 @@
     /* ===== Shows (auto-height) ===== */
     .shows{
       border:1px solid rgba(255,255,255,.08); background:linear-gradient(180deg,#15152a,#101024);
-      border-radius:14px; padding:12px 14px; margin:4px 0 14px;
+      border-radius:14px; padding:12px 14px; margin:0;
       display:flex; flex-direction:column; gap:8px;
     }
     .show-track{width:100%;}
     .show-card{
-      /* no absolute positioning; only active slide is displayed */
       display:none;
       align-items:flex-start; gap:10px; padding:4px 2px;
       opacity:0; transform:translateY(4px);
@@ -103,14 +102,12 @@
     .show-text a.where{color:#cfc7ff; text-decoration:none; border-bottom:1px dashed rgba(207,199,255,.4);}
     .show-text a.where:hover{text-decoration:underline}
 
-    /* Place dots below content so they never overlap text */
     .dots{display:flex; gap:6px; align-self:flex-end;}
     .dot{width:6px; height:6px; border-radius:50%; background:rgba(255,255,255,.28); box-shadow:0 0 0 1px rgba(255,255,255,.08) inset; opacity:.6;}
     .dot.active{opacity:1; background:#e9ebf0}
 
     .status{font-size:.8rem; opacity:.75;}
 
-    /* Narrow phones: let venue wrap, no layout shifts */
     @media (max-width:360px){
       .show-card{padding-right:0}
     }
@@ -130,8 +127,8 @@
     .icon{width:24px; height:24px; display:grid; place-items:center; flex:0 0 auto;}
     .btn span:last-child{font-size:clamp(1rem, .98rem + .3vw, 1.08rem); line-height:1.2;}
 
-    .meta{margin-top:14px; color:var(--muted); font-size:.9rem; text-align:center;}
-    footer{margin-top:16px; display:flex; justify-content:center; gap:14px; flex-wrap:wrap; color:var(--muted); font-size:.9rem;}
+    .meta{margin-top:4px; color:var(--muted); font-size:.9rem; text-align:center;}
+    footer{margin-top:auto; /* CHANGED: push footer to bottom */ display:flex; justify-content:center; gap:14px; flex-wrap:wrap; color:var(--muted); font-size:.9rem;}
     footer a{color:#cfc7ff; text-decoration:none;} footer a:hover{text-decoration:underline;}
 
     @media (prefers-reduced-motion: reduce){
@@ -162,7 +159,18 @@
       <div class="status" id="showsStatus">Loading upcoming shows…</div>
     </section>
 
+    <!-- All action links live in one grid to prevent stacking -->
     <nav class="links" aria-label="Quick links">
+      <!-- New Year's Tickets FIRST inside grid -->
+      <a class="btn" href="https://submit.jotform.com/desotocolumbiaanns/NYE" target="_blank" rel="noopener noreferrer">
+        <span class="icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="24" height="24" fill="none" aria-hidden="true">
+            <path d="M14 9h3V6h-3a3 3 0 00-3 3v2H8v3h3v6h3v-6h2.5l.5-3H14V9a1 1 0 011-1z" fill="#cfc7ff"/>
+          </svg>
+        </span>
+        <span>New Year’s Tickets</span>
+      </a>
+
       <!-- Website / Booking -->
       <a class="btn" href="https://voices.band" target="_blank" rel="noopener noreferrer">
         <span class="icon" aria-hidden="true">
@@ -217,16 +225,6 @@
         <span>Instagram</span>
       </a>
     </nav>
-
-    <!-- New Year's Link -->
-      <a class="btn" href="https://submit.jotform.com/desotocolumbiaanns/NYE" target="_blank" rel="noopener noreferrer">
-        <span class="icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" width="24" height="24" fill="none" aria-hidden="true">
-            <path d="M14 9h3V6h-3a3 3 0 00-3 3v2H8v3h3v6h3v-6h2.5l.5-3H14V9a1 1 0 011-1z" fill="#cfc7ff"/>
-          </svg>
-        </span>
-        <span>New Years Tickets</span>
-      </a>
 
     <p class="meta">Tap a button to open in your app.</p>
 
@@ -365,7 +363,6 @@
         cards.push(card); dots.push(dot);
       });
 
-      // find index by venue, else 0
       const newIndex = currentVenue ? cards.findIndex(c => c.querySelector('.where strong')?.textContent === currentVenue) : 0;
       idx = newIndex >= 0 ? newIndex : 0;
       activate(idx);
@@ -403,7 +400,7 @@
       }
     }
 
-    function startPoll(){ if (!pollTimer) pollTimer = setInterval(refresh, POLL_MS); }
+    function startPoll(){ if (!pollTimer) pollTimer = setInterval(refresh, 15000); }
     function stopPoll(){ if (pollTimer){ clearInterval(pollTimer); pollTimer = null; } }
 
     (async function init(){
