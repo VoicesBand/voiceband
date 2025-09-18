@@ -142,6 +142,25 @@
     }
     #newsletter button:hover{ background:rgba(0,191,255,.12); }
     #newsletter small{ display:block; margin-top:8px; color:#8e98aa; }
+
+    /* ===== Mobile nav: keep buttons in one row, allow horizontal scroll ===== */
+    @media (max-width: 720px){
+      .nav-center { flex: 1 1 auto; min-width: 0; }
+      .nav-scroll {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;            /* Firefox */
+      }
+      .nav-scroll::-webkit-scrollbar { display: none; } /* WebKit */
+      .nav-bar {
+        flex-wrap: nowrap;                /* prevent stacking */
+        gap: 6px;                         /* slightly tighter spacing */
+      }
+      .nav-bar button,
+      .nav-bar .admin-link {
+        flex: 0 0 auto;                   /* no shrinking/wrapping */
+      }
+    }
   </style>
 </head>
 <body>
