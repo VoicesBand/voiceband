@@ -6,6 +6,84 @@
   <title>Voices - STL's Premier Classic Band</title>
   <link rel="stylesheet" href="style.css" />
   <link rel="icon" href="images/logoGTO.jpg" type="image/jpeg">
+
+  <!-- Scoped styles for the carousel shows component (site theme) -->
+  <style>
+    /* Theme-following container (subtle, dark, no flashy gradients) */
+    #live-upcoming { margin-top: 20px; }
+    .shows{
+      border:1px solid rgba(255,255,255,.08);
+      background:rgba(255,255,255,.03);
+      border-radius:14px;
+      padding:12px 14px;
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+    }
+    .show-track{width:100%;}
+    .show-card{
+      display:none;
+      align-items:flex-start;
+      gap:12px;
+      padding:6px 2px;
+      opacity:0;
+      transform:translateY(4px);
+      transition:opacity .2s ease, transform .2s ease;
+    }
+    .show-card.active{display:flex; opacity:1; transform:translateY(0)}
+
+    .tag{
+      font-size:.78rem;
+      letter-spacing:.3px;
+      padding:6px 10px;
+      border-radius:999px;
+      background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.08);
+      white-space:nowrap;
+      flex:0 0 auto;
+    }
+
+    .show-text{line-height:1.25; font-size:clamp(.95rem, .92rem + .2vw, 1.05rem); min-width:0; display:flex; flex-direction:column; gap:4px;}
+    .show-text .where{display:block; white-space:normal; overflow:visible;}
+    .show-text .time{opacity:.9; font-size:.92em;}
+    .show-text a.where{color:#cfc7ff; text-decoration:none; border-bottom:1px dashed rgba(207,199,255,.3);}
+    .show-text a.where:hover{text-decoration:underline}
+
+    /* Copy button */
+    .copy-btn{
+      margin-left:auto;
+      flex:0 0 auto;
+      align-self:center;
+      display:inline-flex; align-items:center; gap:8px;
+      height:34px; padding:0 12px;
+      border-radius:10px;
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(255,255,255,.04);
+      color:inherit;
+      font:inherit;
+      cursor:pointer;
+      transition:transform .08s ease, background .15s ease, border-color .15s ease, opacity .2s ease;
+    }
+    .copy-btn:hover,.copy-btn:focus-visible{
+      background:rgba(255,255,255,.08);
+      border-color:rgba(207,199,255,.35);
+      outline:none;
+    }
+    .copy-btn:active{transform:translateY(1px)}
+    .copy-icon{width:18px;height:18px;display:inline-block;line-height:0}
+
+    .dots{display:flex; gap:6px; align-self:flex-end; margin-top:4px;}
+    .dot{width:6px; height:6px; border-radius:50%; background:rgba(255,255,255,.28); box-shadow:0 0 0 1px rgba(255,255,255,.08) inset; opacity:.6;}
+    .dot.active{opacity:1; background:#e9ebf0}
+    .status{font-size:.85rem; opacity:.8;}
+
+    @media (max-width:360px){ .show-card{padding-right:0} }
+    @media (prefers-reduced-motion: reduce){
+      .show-card{transition:none}
+      .copy-btn{transition:none}
+    }
+  </style>
+
   <script>
     const staticData = {
       logoURL: "images/logoGTO.jpg",
@@ -37,6 +115,7 @@
       tiktok: "https://cdn-icons-png.flaticon.com/512/3046/3046120.png"
     };
 
+    // --- Helpers (shared) ---
     function formatDateString(dateStr) {
       if (!dateStr) return '';
       const dateObj = new Date(dateStr);
@@ -54,7 +133,6 @@
       }
       return `${monthNames[dateObj.getMonth()]} ${ordinalSuffix(day)}`;
     }
-
     function formatTimeForDisplay(timeValue) {
       if (!timeValue) return "Time TBD";
       if (typeof timeValue === 'string') {
@@ -81,6 +159,7 @@
     function updatePage() {
       document.getElementById('logo-img').src = staticData.logoURL;
       document.getElementById('about-text').textContent = staticData.aboutText;
+
       const videoGrid = document.getElementById('video-grid');
       videoGrid.innerHTML = '';
       staticData.videoUrls.forEach(url => {
@@ -90,6 +169,7 @@
         iframe.setAttribute('frameborder', '0');
         videoGrid.appendChild(iframe);
       });
+
       const socials = document.getElementById('social-links');
       socials.innerHTML = '';
       staticData.socials.forEach(({ platform, url }) => {
@@ -108,23 +188,217 @@
       if (section) section.scrollIntoView({ behavior: 'smooth' });
     }
 
+    // ---- Upcoming Shows (carousel) below the image carousel ----
+    const webAppURL = "https://script.google.com/macros/s/AKfycbyDTA_oy4BqqP-3ZeAkyV7UPugAcJ-YCbhwxCMZRtGyLDzoCa_pWMRVJAy2mdScDLr3wQ/exec";
+    const POLL_MS = 15000;
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const today = new Date(); today.setHours(0,0,0,0);
+
+    let showsEl, trackEl, dotsEl, statusEl;
+
+    function normalize(raw){
+      return (raw || []).map(s => ({
+        date:    s.Date,
+        time:    s.Time,
+        title:   s.Location || "Show", // used for display
+        city:    s.City || "",
+        map:     s.Map || "",
+        Location: s.Location || ""     // raw Location for copy (treat as address)
+      }))
+      .filter(s => {
+        if (!s.date) return false;
+        const d = new Date(s.date); d.setHours(0,0,0,0);
+        return d >= today;
+      })
+      .sort((a,b) => new Date(a.date) - new Date(b.date));
+    }
+
+    function tryAddressFromMap(mapUrl){
+      try{
+        if (!mapUrl) return "";
+        const u = new URL(mapUrl);
+
+        // 1) ?q=...
+        const q = u.searchParams.get('q');
+        if (q) return decodeURIComponent(q).replace(/\+/g,' ').trim();
+
+        // 2) ?query=...
+        const query = u.searchParams.get('query');
+        if (query) return decodeURIComponent(query).replace(/\+/g,' ').trim();
+
+        // 3) /maps/place/<addr>  or /maps/search/<addr>
+        const path = decodeURIComponent(u.pathname);
+        const m = path.match(/\/maps\/(?:place|search)\/([^/]+)/i);
+        if (m && m[1]) return m[1].replace(/\+/g,' ').replace(/,/g, ', ').trim();
+      }catch(e){}
+      return "";
+    }
+
+    // Build ONLY the address text (no date/time/venue). Use Location as address.
+    function buildAddressOnly(s){
+      const addr = (s.Location && s.Location.trim()) || tryAddressFromMap(s.map);
+      return addr || "";
+    }
+
+    function clipboardCopy(text){
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        return navigator.clipboard.writeText(text);
+      }
+      // fallback
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand('copy'); } finally { document.body.removeChild(ta); }
+      return Promise.resolve();
+    }
+
+    function hash(obj){ return JSON.stringify(obj); }
+
+    let cards = [];
+    let dots  = [];
+    let idx   = 0;
+    let rotateTimer = null;
+    let pollTimer   = null;
+    let lastHash    = "";
+
+    function clearChildren(node){ while(node.firstChild) node.removeChild(node.firstChild); }
+    function activate(i){
+      cards.forEach((c,j)=>c.classList.toggle('active', j===i));
+      dots.forEach((d,j)=>d.classList.toggle('active', j===i));
+    }
+    function startRotate(){
+      if (prefersReduced || !cards.length) return;
+      stopRotate();
+      rotateTimer = setInterval(()=>{ idx = (idx + 1) % cards.length; activate(idx); }, 4000);
+    }
+    function stopRotate(){ if (rotateTimer){ clearInterval(rotateTimer); rotateTimer = null; } }
+
+    function render(upcoming){
+      const currentVenue = cards[idx]?.querySelector('.where strong')?.textContent || null;
+
+      clearChildren(trackEl);
+      clearChildren(dotsEl);
+      cards = []; dots = [];
+
+      upcoming.forEach((s)=>{
+        const card = document.createElement('div');
+        card.className = 'show-card';
+
+        const tag = document.createElement('div');
+        tag.className = 'tag';
+        tag.textContent = `${new Date(s.date).toLocaleDateString(undefined,{ weekday:'short' })} • ${formatDateString(s.date)}`;
+
+        const text = document.createElement('div'); text.className = 'show-text';
+
+        const where = document.createElement(s.map ? 'a' : 'span');
+        where.className = 'where';
+        if (s.map){ where.href = s.map; where.target = "_blank"; where.rel = "noopener noreferrer"; }
+        where.title = s.city ? `${s.title} — ${s.city}` : s.title;
+        where.innerHTML = `<strong>${s.title}</strong>${s.city ? ` — ${s.city}` : ''}`;
+
+        const time = document.createElement('div');
+        time.className = 'time';
+        time.textContent = formatTimeForDisplay(s.time);
+
+        // Copy Address button (address ONLY from Location/Map)
+        const copyBtn = document.createElement('button');
+        copyBtn.className = 'copy-btn';
+        copyBtn.type = 'button';
+        copyBtn.setAttribute('aria-label','Copy address');
+        copyBtn.innerHTML = `
+          <span class="copy-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none">
+              <rect x="9" y="9" width="10" height="12" rx="2" stroke="currentColor" stroke-width="2"></rect>
+              <rect x="5" y="3" width="10" height="12" rx="2" stroke="currentColor" stroke-width="2" opacity=".7"></rect>
+            </svg>
+          </span>
+          Copy
+        `;
+        copyBtn.addEventListener('click', async () => {
+          const addressOnly = buildAddressOnly(s);
+          if (!addressOnly){
+            alert('No address available to copy for this event yet.');
+            return;
+          }
+          try {
+            await clipboardCopy(addressOnly);
+            copyBtn.textContent = 'Copied!';
+            setTimeout(()=>{ copyBtn.innerHTML = `
+              <span class="copy-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none">
+                  <rect x="9" y="9" width="10" height="12" rx="2" stroke="currentColor" stroke-width="2"></rect>
+                  <rect x="5" y="3" width="10" height="12" rx="2" stroke="currentColor" stroke-width="2" opacity=".7"></rect>
+                </svg>
+              </span>
+              Copy
+            `; }, 1200);
+          } catch(e){
+            alert('Could not copy. Long-press to copy the address manually:\n\n' + addressOnly);
+          }
+        });
+
+        text.appendChild(where); 
+        text.appendChild(time);
+        card.appendChild(tag); 
+        card.appendChild(text);
+        card.appendChild(copyBtn);
+
+        trackEl.appendChild(card);
+
+        const dot = document.createElement('span'); dot.className = 'dot'; dotsEl.appendChild(dot);
+
+        cards.push(card); dots.push(dot);
+      });
+
+      const newIndex = currentVenue ? cards.findIndex(c => c.querySelector('.where strong')?.textContent === currentVenue) : 0;
+      idx = newIndex >= 0 ? newIndex : 0;
+      activate(idx);
+      startRotate();
+    }
+
+    async function fetchShows(){
+      const res = await fetch(webAppURL + "?_=" + Date.now(), { cache: "no-store", mode: "cors" });
+      if (!res.ok) throw new Error("Apps Script fetch failed: " + res.status);
+      const data = await res.json();
+      return normalize(data);
+    }
+
+    async function refresh(){
+      if (document.hidden) return;
+      try{
+        const upcoming = await fetchShows();
+        const h = hash(upcoming);
+        if (h !== lastHash){
+          lastHash = h;
+          statusEl.textContent = upcoming.length ? "" : "No upcoming shows yet — check back soon!";
+          if (!upcoming.length){
+            stopRotate();
+            trackEl.innerHTML = `<div class="show-card active">
+              <div class="tag">— • —</div>
+              <div class="show-text"><span class="where">No upcoming shows yet</span><div class="time"></div></div>
+              <button class="copy-btn" type="button" disabled>Copy</button>
+            </div>`;
+            while(dotsEl.firstChild) dotsEl.removeChild(dotsEl.firstChild);
+            cards = Array.from(trackEl.children);
+            dots  = [];
+          } else {
+            render(upcoming);
+          }
+        }
+      } catch(err){
+        console.error("[Index] fetch shows error:", err);
+        statusEl.textContent = "Couldn’t load shows. Check connection or Apps Script.";
+      }
+    }
+
+    function startPoll(){ if (!pollTimer) pollTimer = setInterval(refresh, POLL_MS); }
+    function stopPoll(){ if (pollTimer){ clearInterval(pollTimer); pollTimer = null; } }
+
+    // ---- Image banner carousel (above shows) ----
     const carouselImages = [
-      'images/1.JPG',
-      'images/2.JPG',
-      'images/3.JPG',
-      'images/4.JPG',
-      'images/5.JPG',
-      'images/6.JPG',
-      'images/7.JPG',
-      'images/8.JPG',
-      'images/9.JPG',
-      'images/10.JPG',
-      'images/11.JPG',
-      'images/12.JPG',
-      'images/13.JPG',
-      'images/14.JPG',
-      'images/15.JPG',
-      'images/16.JPG',
+      'images/1.JPG','images/2.JPG','images/3.JPG','images/4.JPG','images/5.JPG',
+      'images/6.JPG','images/7.JPG','images/8.JPG','images/9.JPG','images/10.JPG'
     ];
     let currentImgIndex = 0;
     function cycleCarousel() {
@@ -133,43 +407,58 @@
       img.src = carouselImages[currentImgIndex];
     }
 
-    const webAppURL = "https://script.google.com/macros/s/AKfycbypoywOOb-OVX1V-o5COdtL7mQqGoFJn4oD23FH9iuAeTy7Y8SmN86HRhjCbc6dOrz3/exec";
-    function loadDynamicShows() {
-      fetch(webAppURL)
-        .then(res => res.json())
-        .then(data => {
-          const output = document.getElementById('dynamic-shows-output');
-          if (data.error) {
-            output.textContent = "Error: " + data.error;
-            return;
-          }
-          if (!data.length) {
-            output.textContent = "No shows found.";
-            return;
-          }
-          let html = '';
-          data.forEach(show => {
-            const location = show.Location || 'Unknown Location';
-            const dateFormatted = formatDateString(show.Date);
-            const timeFormatted = formatTimeForDisplay(show.Time);
-            if (!location || !dateFormatted) return;
-            html += `<div class="show-entry">${location} ${dateFormatted} at ${timeFormatted}</div>`;
-          });
-          output.innerHTML = html || "No valid shows found.";
-        })
-        .catch(err => {
-          document.getElementById('dynamic-shows-output').textContent = "Fetch error: " + err.message;
-        });
-    }
-
     window.onload = () => {
       updatePage();
-      setInterval(cycleCarousel, 4000);
-      loadDynamicShows();
-      setInterval(loadDynamicShows, 10000);
 
+      // start image carousel
+      setInterval(cycleCarousel, 4000);
+
+      // init shows carousel (DOM refs now exist)
+      showsEl  = document.getElementById('shows');
+      trackEl  = document.getElementById('showTrack');
+      dotsEl   = document.getElementById('dots');
+      statusEl = document.getElementById('showsStatus');
+
+      (async function initShows(){
+        await refresh();
+
+        showsEl.addEventListener('mouseenter', stopRotate);
+        showsEl.addEventListener('mouseleave', startRotate);
+        showsEl.addEventListener('focusin',  stopRotate);
+        showsEl.addEventListener('focusout', startRotate);
+
+        // Swipe
+        let x0 = null;
+        showsEl.addEventListener('touchstart', e => { x0 = e.touches[0].clientX; }, {passive:true});
+        showsEl.addEventListener('touchend', e => {
+          if (x0 == null || !cards.length) return;
+          const dx = e.changedTouches[0].clientX - x0;
+          if (Math.abs(dx) > 30){
+            idx = (idx + (dx < 0 ? 1 : -1) + cards.length) % cards.length;
+            activate(idx);
+          }
+          x0 = null;
+        });
+
+        // Keyboard
+        showsEl.tabIndex = 0;
+        showsEl.addEventListener('keydown', e => {
+          if (!cards.length) return;
+          if (e.key === 'ArrowRight'){ idx = (idx + 1) % cards.length; activate(idx); e.preventDefault(); }
+          if (e.key === 'ArrowLeft'){  idx = (idx - 1 + cards.length) % cards.length; activate(idx); e.preventDefault(); }
+        });
+
+        // Poll for updates, pause when tab hidden
+        document.addEventListener('visibilitychange', () => {
+          if (document.hidden) { stopPoll(); stopRotate(); }
+          else { startPoll(); startRotate(); refresh(); }
+        });
+        startPoll();
+      })();
+
+      // Booking + Newsletter (unchanged)
       const form = document.getElementById("booking-form");
-      const scriptURL = "https://script.google.com/macros/s/AKfycbypoywOOb-OVX1V-o5COdtL7mQqGoFJn4oD23FH9iuAeTy7Y8SmN86HRhjCbc6dOrz3/exec";
+      const scriptURL = "https://script.google.com/macros/s/AKfycbyDTA_oy4BqqP-3ZeAkyV7UPugAcJ-YCbhwxCMZRtGyLDzoCa_pWMRVJAy2mdScDLr3wQ/exec";
 
       form.addEventListener("submit", (e) => {
         e.preventDefault();
@@ -244,16 +533,19 @@
     <p id="about-text"></p>
   </section>
 
+  <!-- Image carousel -->
   <div id="carousel">
     <img id="carousel-img" src="images/1.JPG" alt="Band Carousel" />
   </div>
 
-  <!-- 🔁 Reassigned section -->
-  <section id="live-upcoming">
-    <div id="dynamic-shows-container" style="margin-top:20px; background:#222; padding:15px; border-radius:8px;">
-      <h3 style="color:#00bfff;">Live Upcoming Shows</h3>
-      <div id="dynamic-shows-output" style="color:#eee;">Loading shows...</div>
-    </div>
+  <!-- Upcoming Shows BELOW the image carousel -->
+  <section id="live-upcoming" aria-label="Live Upcoming Shows">
+    <h3 style="color:#00bfff; margin: 16px 0 8px;">Live Upcoming Shows</h3>
+    <section class="shows" id="shows" aria-label="Upcoming shows" aria-live="polite">
+      <div class="show-track" id="showTrack"></div>
+      <div class="dots" id="dots" aria-hidden="true"></div>
+      <div class="status" id="showsStatus">Loading upcoming shows…</div>
+    </section>
   </section>
 
   <section id="gallery">
@@ -286,7 +578,3 @@
 
 </body>
 </html>
-
-
-
-
