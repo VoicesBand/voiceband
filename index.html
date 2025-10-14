@@ -58,7 +58,7 @@
     .nav-socials a:hover{ background:rgba(255,255,255,.1); border-color:rgba(125,166,255,.35); transform:translateY(-1px); }
     .nav-socials svg{ width:16px; height:16px; display:block; }
 
-    /* --- Upcoming Shows (unchanged) --- */
+    /* --- Upcoming Shows --- */
     .shows{
       border:1px solid rgba(255,255,255,.08);
       background:rgba(255,255,255,.03);
@@ -86,8 +86,8 @@
     #gallery .btn-row{ text-align:center; margin-top:12px; }
     #gallery .btn-row .btn{ display:inline-block; }
 
-    /* --- Compact modern booking form (not huge) --- */
-    #booking .form-modern{ max-width:840px; margin:0 auto; display:flex; flex-direction:column; gap:12px; }
+    /* --- Compact modern booking form --- */
+    #booking .form-modern{ max-width:840px; margin:0 auto; display:flex; flex-direction:column; gap:12px; position:relative; }
     #booking .row{ display:grid; gap:12px; grid-template-columns:repeat(2, minmax(0,1fr)); }
     @media (max-width:720px){ #booking .row{ grid-template-columns:1fr; } }
     #booking input, #booking textarea{
@@ -96,7 +96,7 @@
       background:#151515;
       border:1px solid rgba(255,255,255,.12);
       border-radius:10px;
-      padding:10px 12px;                       /* compact */
+      padding:10px 12px;
       font-size:0.95rem; line-height:1.2;
       color:#e9ecf3;
     }
@@ -109,7 +109,7 @@
     }
     #booking .actions{ display:flex; justify-content:center; }
     #booking .btn-submit{
-      padding:9px 16px;                         /* compact – not oversized */
+      padding:9px 16px;
       border-radius:10px;
       border:1px solid rgba(0,191,255,.7);
       background:#00bfff;
@@ -121,7 +121,6 @@
 
     /* --- Subtle / non-chalant newsletter --- */
     #newsletter{ text-align:center; }
-    /* Match other section headings (use site defaults) */
     #newsletter h2{ margin-bottom:8px; }
     #newsletter .micro{
       display:inline-flex; align-items:center; gap:8px;
@@ -141,7 +140,6 @@
       padding:8px 10px; border-radius:8px; font-weight:600; cursor:pointer;
     }
     #newsletter button:hover{ background:rgba(0,191,255,.12); }
-    #newsletter small{ display:block; margin-top:8px; color:#8e98aa; }
 
     /* ===== Mobile nav: keep buttons in one row, allow horizontal scroll ===== */
     @media (max-width: 720px){
@@ -149,17 +147,11 @@
       .nav-scroll {
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
-        scrollbar-width: none;            /* Firefox */
+        scrollbar-width: none;
       }
-      .nav-scroll::-webkit-scrollbar { display: none; } /* WebKit */
-      .nav-bar {
-        flex-wrap: nowrap;                /* prevent stacking */
-        gap: 6px;                         /* slightly tighter spacing */
-      }
-      .nav-bar button,
-      .nav-bar .admin-link {
-        flex: 0 0 auto;                   /* no shrinking/wrapping */
-      }
+      .nav-scroll::-webkit-scrollbar { display: none; }
+      .nav-bar { flex-wrap: nowrap; gap: 6px; }
+      .nav-bar button, .nav-bar .admin-link { flex: 0 0 auto; }
     }
   </style>
 </head>
@@ -181,7 +173,6 @@
             <button onclick="scrollToSection('live-upcoming')">shows</button>
             <button onclick="scrollToSection('gallery')">gallery</button>
             <button onclick="scrollToSection('booking')">booking</button>
-            <!-- newsletter button removed from navbar -->
             <a href="admin.html" class="admin-link">Admin</a>
           </div>
         </nav>
@@ -219,13 +210,13 @@
     <img src="images/banner.jpg" alt="Voices Band Banner" />
   </header>
 
-  <!-- ABOUT (modern card) -->
+  <!-- ABOUT -->
   <section id="about" class="card-dark">
     <h2>🎤 Voices</h2>
     <p id="about-text" class="sub"></p>
   </section>
 
-  <!-- IMAGE CAROUSEL (original simple) -->
+  <!-- IMAGE CAROUSEL -->
   <div id="carousel">
     <img id="carousel-img" src="images/1.JPG" alt="Band Carousel" />
   </div>
@@ -240,7 +231,7 @@
     </section>
   </section>
 
-  <!-- MEDIA GALLERY (modern card; two-up + bottom button) -->
+  <!-- MEDIA GALLERY -->
   <section id="gallery" class="card-dark">
     <h2>Media Gallery</h2>
     <div class="video-grid" id="video-grid"></div>
@@ -249,26 +240,37 @@
     </div>
   </section>
 
-  <!-- BOOKING (compact modern form) -->
+  <!-- BOOKING (with anti-bot fields matching GAS) -->
   <section id="booking">
     <h2>Book Voices</h2>
-    <form id="booking-form" class="form-modern">
+    <form id="booking-form" class="form-modern" autocomplete="off">
+      <!-- Honeypot (bots fill it; humans never see it) -->
+      <div style="position:absolute;left:-10000px;top:auto;width:1px;height:1px;overflow:hidden;">
+        <label>Leave this field blank
+          <input type="text" name="hp_url" tabindex="-1" autocomplete="off">
+        </label>
+      </div>
+      <!-- Anti-bot metadata expected by GAS -->
+      <input type="hidden" name="form_started_ms" id="bk-started" value="">
+      <input type="hidden" name="nonce" id="bk-nonce" value="">
+      <!-- If you enable reCAPTCHA later, add <input type="hidden" name="recaptcha" id="bk-recaptcha"> -->
+
       <div class="row">
         <input type="text" name="name" placeholder="Your Name" required />
         <input type="email" name="email" placeholder="Your Email" required />
       </div>
       <div class="row">
-        <input type="text" name="date" placeholder="Requested Date" />
-        <input type="text" name="location" placeholder="Event Location" />
+        <input type="text" name="date" placeholder="Requested Date" required />
+        <input type="text" name="location" placeholder="Event Location" required />
       </div>
-      <textarea name="message" placeholder="Additional Info or Questions"></textarea>
+      <textarea name="message" placeholder="Additional Info or Questions" maxlength="1000"></textarea>
       <div class="actions">
         <button type="submit" class="btn-submit">Submit Booking</button>
       </div>
     </form>
   </section>
 
-  <!-- NEWSLETTER (subtle inline form) -->
+  <!-- NEWSLETTER -->
   <section id="newsletter">
     <h2>Newsletter</h2>
     <div class="micro">
@@ -307,7 +309,6 @@
         "https://www.youtube.com/embed/-oo8J8FeD-I",
         "https://www.youtube.com/embed/bl5HUp8BnlE"
       ],
-      /* Optional: not used unless a Socials section exists in DOM */
       socials: [
         { platform: "Facebook", url: "https://www.facebook.com/voicessing/" },
         { platform: "YouTube",  url: "https://youtube.com/@VoicesSTL" },
@@ -316,7 +317,6 @@
       ]
     };
 
-    // Formats (used by shows)
     function formatDateString(dateStr) {
       if (!dateStr) return '';
       const dateObj = new Date(dateStr);
@@ -384,7 +384,7 @@
       }
     }
 
-    /* ---------- Image Carousel (original simple) ---------- */
+    /* ---------- Image Carousel ---------- */
     const carouselImages = [
       'images/1.JPG','images/2.JPG','images/3.JPG','images/4.JPG','images/5.JPG',
       'images/6.JPG','images/7.JPG','images/8.JPG','images/9.JPG','images/10.JPG','images/11.JPG','images/12.JPG','images/13.JPG','images/14.JPG','images/15.JPG','images/16.JPG'
@@ -396,8 +396,8 @@
       img.src = carouselImages[currentImgIndex];
     }
 
-    /* ---------- Upcoming Shows (unchanged working logic) ---------- */
-    const webAppURL = "https://script.google.com/macros/s/AKfycbyDTA_oy4BqqP-3ZeAkyV7UPugAcJ-YCbhwxCMZRtGyLDzoCa_pWMRVJAy2mdScDLr3wQ/exec";
+    /* ---------- Upcoming Shows ---------- */
+    const webAppURL = "https://script.google.com/macros/s/AKfycbz92casEHmVvhw9Xc46Mv7cbm9USjWNusekHGQFSfLyxpOFdb5yGYhC8_KyNxZjiXIQZQ/exec";
     const POLL_MS = 15000;
     const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const today = new Date(); today.setHours(0,0,0,0);
@@ -510,17 +510,27 @@
     function startPoll(){ if (!pollTimer) pollTimer = setInterval(refresh, POLL_MS); }
     function stopPoll(){ if (pollTimer){ clearInterval(pollTimer); pollTimer = null; } }
 
-    // Booking + Newsletter (newsletter uses inline input now)
-    const scriptURL = "https://script.google.com/macros/s/AKfycbyDTA_oy4BqqP-3ZeAkyV7UPugAcJ-YCbhwxCMZRtGyLDzoCa_pWMRVJAy2mdScDLr3wQ/exec";
+    // Booking + Newsletter endpoints
+    const scriptURL = webAppURL; // same Apps Script endpoint
 
-    window.onload=()=>{
+    // ---------- Anti-bot: nonce + start time (matches your GAS) ----------
+    let currentNonce = "";
+    async function mintNonce(){
+      try{
+        const res = await fetch(scriptURL + "?action=nonce", { cache:"no-store", mode:"cors" });
+        const j = await res.json();
+        currentNonce = j && j.nonce ? j.nonce : "";
+      }catch{ currentNonce = ""; }
+    }
+
+    window.onload=async ()=>{
       setStickyHeaderVar();
       updatePage();
       setInterval(cycleCarousel, 4000);
 
       if (location.hash) { setTimeout(() => scrollToSection(location.hash.slice(1)), 0); }
 
-      // Shows (unchanged init)
+      // Shows init
       showsEl  = document.getElementById('shows');
       trackEl  = document.getElementById('showTrack');
       dotsEl   = document.getElementById('dots');
@@ -556,38 +566,97 @@
         startPoll();
       })();
 
+      // Prepare anti-bot metadata
+      await mintNonce();
+
       // Booking
       const form = document.getElementById("booking-form");
-      form.addEventListener("submit", (e) => {
+      const startedEl = document.getElementById("bk-started");
+      const nonceEl   = document.getElementById("bk-nonce");
+      startedEl.value = Date.now().toString();
+      nonceEl.value   = currentNonce;
+
+      function looksHumanName(s){ return /^[a-zA-Z .,'-]{2,60}$/.test((s||'').trim()); }
+      function looksEmail(s){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test((s||'').trim()); }
+
+      form.addEventListener("submit", async (e) => {
         e.preventDefault();
-        const formData = new FormData(form);
-        fetch(scriptURL, { method: "POST", body: new URLSearchParams(formData) })
+        const fd = new FormData(form);
+
+        // client-side guardrails (server rechecks everything)
+        const name = (fd.get("name")||"").trim();
+        const email= (fd.get("email")||"").trim();
+        if (!looksHumanName(name)) return alert("Please enter your real name.");
+        if (!looksEmail(email))    return alert("Please enter a valid email.");
+
+        // Make sure nonce is present
+        if (!currentNonce){ await mintNonce(); nonceEl.value = currentNonce || ""; }
+        const body = new URLSearchParams(fd);
+
+        fetch(scriptURL, { method: "POST", body })
           .then(res => res.json())
-          .then(data => {
-            if (data.result === "success") { alert("✅ Booking submitted successfully!"); form.reset(); }
-            else { alert("❌ Error: " + data.message); }
+          .then(async data => {
+            if (data.result === "success") {
+              alert("✅ Booking submitted successfully!");
+              form.reset();
+              // rotate shields after each submit
+              startedEl.value = Date.now().toString();
+              await mintNonce(); nonceEl.value = currentNonce || "";
+            } else {
+              alert("❌ " + (data.message || "Submission rejected."));
+              // refresh nonce on any error too
+              await mintNonce(); nonceEl.value = currentNonce || "";
+            }
           })
-          .catch(error => { console.error("Error sending booking:", error); alert("❌ Network or system error occurred."); });
+          .catch(async error => {
+            console.error("Error sending booking:", error);
+            alert("❌ Network or system error occurred.");
+            await mintNonce(); nonceEl.value = currentNonce || "";
+          });
       });
 
-      // Newsletter (inline input instead of prompt)
+      // Newsletter
       const newsletterBtn  = document.getElementById("newsletter-btn");
       const newsletterInput= document.getElementById("newsletter-email");
-      newsletterBtn.addEventListener("click", () => {
+      newsletterBtn.addEventListener("click", async () => {
         const email = (newsletterInput.value || "").trim();
-        if (!email || !email.includes("@")) return alert("Please enter a valid email.");
-        fetch(scriptURL, { method: "POST", body: new URLSearchParams({ email, newsletter: "true" }) })
+        if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return alert("Please enter a valid email.");
+
+        // Use same anti-bot metadata
+        const startedMs = (startedEl.value && parseInt(startedEl.value,10)) || Date.now();
+        if (!currentNonce){ await mintNonce(); nonceEl.value = currentNonce || ""; }
+
+        const params = new URLSearchParams({
+          email,
+          newsletter: "true",
+          // anti-bot fields:
+          hp_url: "",                    // honeypot stays empty
+          form_started_ms: String(startedMs),
+          nonce: currentNonce
+        });
+
+        fetch(scriptURL, { method: "POST", body: params })
           .then(res => res.json())
-          .then(data => {
-            if (data.result === "success") { alert("✅ Thanks for signing up! Check your email for confirmation."); newsletterInput.value = ""; }
-            else { alert("❌ Error: " + data.message); }
+          .then(async data => {
+            if (data.result === "success") {
+              alert("✅ Thanks for signing up! Check your email for confirmation.");
+              newsletterInput.value = "";
+              startedEl.value = Date.now().toString();
+              await mintNonce(); nonceEl.value = currentNonce || "";
+            } else {
+              alert("❌ " + (data.message || "Couldn’t sign you up."));
+              await mintNonce(); nonceEl.value = currentNonce || "";
+            }
           })
-          .catch(err => { console.error(err); alert("❌ Failed to sign up."); });
+          .catch(async err => {
+            console.error(err);
+            alert("❌ Failed to sign up.");
+            await mintNonce(); nonceEl.value = currentNonce || "";
+          });
       });
-      // Enter key submits
+      // Enter key submits newsletter
       newsletterInput.addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ e.preventDefault(); newsletterBtn.click(); }});
     };
   </script>
 </body>
 </html>
-
